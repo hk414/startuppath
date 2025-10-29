@@ -1,34 +1,37 @@
 import { CheckCircle2 } from "lucide-react";
-
-const steps = [
-  {
-    number: "01",
-    title: "Document Your Journey",
-    description: "Start by logging your startup's pivots, decisions, and key milestones in an intuitive timeline format.",
-  },
-  {
-    number: "02",
-    title: "Visualize & Reflect",
-    description: "See your decision trees come to life, analyze patterns, and receive AI-powered insights on your progress.",
-  },
-  {
-    number: "03",
-    title: "Connect & Learn",
-    description: "Get matched with mentors, access relevant case studies, and share your lessons with the community.",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HowItWorks = () => {
+  const { t } = useLanguage();
+  
+  const steps = [
+    {
+      number: "01",
+      title: t('howItWorks.step1.title'),
+      description: t('howItWorks.step1.description'),
+    },
+    {
+      number: "02",
+      title: t('howItWorks.step2.title'),
+      description: t('howItWorks.step2.description'),
+    },
+    {
+      number: "03",
+      title: t('howItWorks.step3.title'),
+      description: t('howItWorks.step3.description'),
+    },
+  ];
+
   return (
-    <section id="how-it-works" className="py-24 px-4 bg-gradient-subtle scroll-mt-20">{/* Added id and scroll-mt for header offset */}
+    <section id="how-it-works" className="py-24 px-4 bg-gradient-subtle scroll-mt-20">
       <div className="container max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-            How It Works
+            {t('howItWorks.title')}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Three simple steps to transform your startup journey into shared wisdom
+            {t('howItWorks.subtitle')}
           </p>
         </div>
 

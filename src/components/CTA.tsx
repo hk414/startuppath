@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CTA = () => {
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleGetStarted = () => {
     toast({
@@ -36,15 +38,15 @@ const CTA = () => {
           <div className="relative z-10 text-center space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground text-sm font-medium">
               <Users className="w-4 h-4" />
-              Join 500+ Startups Already Learning Together
+              {t('cta.badge')}
             </div>
 
             <h2 className="text-4xl md:text-5xl font-bold text-primary-foreground max-w-3xl mx-auto leading-tight">
-              Ready to Turn Your Startup Story Into Shared Wisdom?
+              {t('cta.title')}
             </h2>
 
             <p className="text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto">
-              Start documenting your journey today and help build a living knowledge base for the next generation of founders.
+              {t('cta.subtitle')}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -54,7 +56,7 @@ const CTA = () => {
                 className="group bg-card text-foreground hover:bg-card/90"
                 onClick={handleGetStarted}
               >
-                Get Started Free
+                {t('cta.getStarted')}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button 
@@ -63,7 +65,7 @@ const CTA = () => {
                 className="border-2 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
                 onClick={handleScheduleDemo}
               >
-                Schedule a Demo
+                {t('cta.scheduleDemo')}
               </Button>
             </div>
           </div>

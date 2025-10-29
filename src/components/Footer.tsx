@@ -1,7 +1,9 @@
-import { Compass } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import logo from "@/assets/startuppath-logo.jpg";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer className="bg-gradient-subtle border-t border-border py-12 px-4">
@@ -10,35 +12,33 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4 md:col-span-2">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-lg bg-gradient-hero flex items-center justify-center shadow-soft">
-                <Compass className="w-6 h-6 text-primary-foreground" />
-              </div>
-              <span className="text-2xl font-bold text-foreground">Pivot Tracker</span>
+              <img src={logo} alt="StartUpPath Logo" className="w-10 h-10 rounded-lg shadow-soft" />
+              <span className="text-2xl font-bold text-foreground">StartUpPath</span>
             </div>
             <p className="text-muted-foreground max-w-md leading-relaxed">
-              Transforming startup journeys into shared wisdom. Document, learn, and grow with the entrepreneurial community.
+              {t('footer.description')}
             </p>
           </div>
 
           {/* Product Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Product</h3>
+            <h3 className="font-semibold text-foreground">{t('footer.product')}</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Features</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Pricing</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Case Studies</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Guidebook</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.features')}</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.pricing')}</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.caseStudies')}</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.guidebook')}</a></li>
             </ul>
           </div>
 
           {/* Company Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Company</h3>
+            <h3 className="font-semibold text-foreground">{t('footer.company')}</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">About Us</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Blog</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Careers</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">Contact</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.about')}</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.blog')}</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.careers')}</a></li>
+              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.contact')}</a></li>
             </ul>
           </div>
         </div>
@@ -46,12 +46,12 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} Pivot Tracker. All rights reserved.
+            © {currentYear} StartUpPath. {t('footer.copyright')}
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">Cookie Policy</a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.privacy')}</a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.terms')}</a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.cookies')}</a>
           </div>
         </div>
       </div>

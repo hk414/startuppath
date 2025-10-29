@@ -3,48 +3,51 @@ import timelineIcon from "@/assets/timeline-icon.png";
 import treeIcon from "@/assets/tree-icon.png";
 import mentorIcon from "@/assets/mentor-icon.png";
 import guidebookIcon from "@/assets/guidebook-icon.png";
-
-const features = [
-  {
-    icon: timelineIcon,
-    title: "Interactive Timeline",
-    description: "Log every pivot, decision, and milestone in your startup journey with a visual timeline that brings your story to life.",
-    gradient: "from-primary/10 to-primary-glow/10",
-  },
-  {
-    icon: treeIcon,
-    title: "Decision Trees",
-    description: "Visualize how each choice led to outcomes, creating a clear map of cause and effect throughout your startup evolution.",
-    gradient: "from-secondary/10 to-secondary/20",
-  },
-  {
-    icon: mentorIcon,
-    title: "AI Mentor Matching",
-    description: "Get paired with experienced mentors based on your industry, startup stage, and unique pivot history for personalized guidance.",
-    gradient: "from-accent/10 to-accent/20",
-  },
-  {
-    icon: guidebookIcon,
-    title: "Guidebook Library",
-    description: "Access step-by-step startup guides, best practices, case studies, and actionable frameworks from real founders.",
-    gradient: "from-primary-glow/10 to-primary/10",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Features = () => {
+  const { t } = useLanguage();
+  
+  const features = [
+    {
+      icon: timelineIcon,
+      title: t('features.timeline.title'),
+      description: t('features.timeline.description'),
+      gradient: "from-primary/10 to-primary-glow/10",
+    },
+    {
+      icon: treeIcon,
+      title: t('features.decisions.title'),
+      description: t('features.decisions.description'),
+      gradient: "from-secondary/10 to-secondary/20",
+    },
+    {
+      icon: mentorIcon,
+      title: t('features.mentor.title'),
+      description: t('features.mentor.description'),
+      gradient: "from-accent/10 to-accent/20",
+    },
+    {
+      icon: guidebookIcon,
+      title: t('features.guidebook.title'),
+      description: t('features.guidebook.description'),
+      gradient: "from-primary-glow/10 to-primary/10",
+    },
+  ];
+
   return (
-    <section id="features" className="py-24 px-4 bg-background scroll-mt-20">{/* Added id and scroll-mt for header offset */}
+    <section id="features" className="py-24 px-4 bg-background scroll-mt-20">
       <div className="container max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-            Everything You Need to{" "}
+            {t('features.title')}{" "}
             <span className="bg-gradient-accent bg-clip-text text-transparent">
-              Learn and Grow
+              {t('features.titleHighlight')}
             </span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            A complete platform designed to capture, analyze, and share the entrepreneurial journey
+            {t('features.subtitle')}
           </p>
         </div>
 

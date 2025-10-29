@@ -77,6 +77,67 @@ const translations = {
       signIn: "Sign In",
       dashboard: "Dashboard",
     },
+    features: {
+      title: "Everything You Need to",
+      titleHighlight: "Learn and Grow",
+      subtitle: "A complete platform designed to capture, analyze, and share the entrepreneurial journey",
+      timeline: {
+        title: "Interactive Timeline",
+        description: "Log every pivot, decision, and milestone in your startup journey with a visual timeline that brings your story to life.",
+      },
+      decisions: {
+        title: "Decision Trees",
+        description: "Visualize how each choice led to outcomes, creating a clear map of cause and effect throughout your startup evolution.",
+      },
+      mentor: {
+        title: "AI Mentor Matching",
+        description: "Get paired with experienced mentors based on your industry, startup stage, and unique pivot history for personalized guidance.",
+      },
+      guidebook: {
+        title: "Guidebook Library",
+        description: "Access step-by-step startup guides, best practices, case studies, and actionable frameworks from real founders.",
+      },
+    },
+    howItWorks: {
+      title: "How It Works",
+      subtitle: "Three simple steps to transform your startup journey into shared wisdom",
+      step1: {
+        title: "Document Your Journey",
+        description: "Start by logging your startup's pivots, decisions, and key milestones in an intuitive timeline format.",
+      },
+      step2: {
+        title: "Visualize & Reflect",
+        description: "See your decision trees come to life, analyze patterns, and receive AI-powered insights on your progress.",
+      },
+      step3: {
+        title: "Connect & Learn",
+        description: "Get matched with mentors, access relevant case studies, and share your lessons with the community.",
+      },
+    },
+    cta: {
+      badge: "Join 500+ Startups Already Learning Together",
+      title: "Ready to Turn Your Startup Story Into Shared Wisdom?",
+      subtitle: "Start documenting your journey today and help build a living knowledge base for the next generation of founders.",
+      getStarted: "Get Started Free",
+      scheduleDemo: "Schedule a Demo",
+    },
+    footer: {
+      description: "Transforming startup journeys into shared wisdom. Document, learn, and grow with the entrepreneurial community.",
+      product: "Product",
+      features: "Features",
+      pricing: "Pricing",
+      caseStudies: "Case Studies",
+      guidebook: "Guidebook",
+      company: "Company",
+      about: "About Us",
+      blog: "Blog",
+      careers: "Careers",
+      contact: "Contact",
+      copyright: "All rights reserved.",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+      cookies: "Cookie Policy",
+    },
     hero: {
       badge: "Turn Every Pivot Into Shared Wisdom",
       title1: "Document Your",
