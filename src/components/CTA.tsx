@@ -1,9 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const CTA = () => {
+  const { toast } = useToast();
+
+  const handleGetStarted = () => {
+    toast({
+      title: "Welcome aboard! 🚀",
+      description: "Sign up functionality is coming soon. For now, try chatting with the AI mentor!",
+    });
+  };
+
+  const handleScheduleDemo = () => {
+    toast({
+      title: "Great choice! 📅",
+      description: "Demo scheduling is coming soon. Try the AI mentor chat to get started!",
+    });
+  };
+
   return (
-    <section className="py-24 px-4 bg-background">
+    <section id="cta" className="py-24 px-4 bg-background scroll-mt-20">{/* Added id and scroll-mt for header offset */}
       <div className="container max-w-5xl mx-auto">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-hero p-12 md:p-16 shadow-strong">
           {/* Background Pattern */}
@@ -31,7 +48,12 @@ const CTA = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-              <Button variant="accent" size="lg" className="group bg-card text-foreground hover:bg-card/90">
+              <Button 
+                variant="accent" 
+                size="lg" 
+                className="group bg-card text-foreground hover:bg-card/90"
+                onClick={handleGetStarted}
+              >
                 Get Started Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
@@ -39,6 +61,7 @@ const CTA = () => {
                 variant="outline" 
                 size="lg" 
                 className="border-2 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
+                onClick={handleScheduleDemo}
               >
                 Schedule a Demo
               </Button>

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Compass, Menu } from "lucide-react";
+import scrollToSection from "@/utils/scrollToSection";
 
 const Header = () => {
   return (
@@ -16,26 +17,42 @@ const Header = () => {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            <button 
+              onClick={() => scrollToSection('features')}
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+            >
               Features
-            </a>
-            <a href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+            </button>
+            <button 
+              onClick={() => scrollToSection('how-it-works')}
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+            >
               How It Works
-            </a>
-            <a href="#stories" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              Success Stories
-            </a>
-            <a href="#guidebook" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              Guidebook
-            </a>
+            </button>
+            <button 
+              onClick={() => scrollToSection('cta')}
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+            >
+              Get Started
+            </button>
           </div>
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="hidden md:inline-flex">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="hidden md:inline-flex"
+              onClick={() => alert('Sign in functionality coming soon!')}
+            >
               Sign In
             </Button>
-            <Button variant="default" size="sm" className="shadow-soft">
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="shadow-soft"
+              onClick={() => scrollToSection('cta')}
+            >
               Get Started
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden">

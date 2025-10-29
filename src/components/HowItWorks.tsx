@@ -20,7 +20,7 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-24 px-4 bg-gradient-subtle">
+    <section id="how-it-works" className="py-24 px-4 bg-gradient-subtle scroll-mt-20">{/* Added id and scroll-mt for header offset */}
       <div className="container max-w-6xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">

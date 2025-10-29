@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
+import scrollToSection from "@/utils/scrollToSection";
 
 const Hero = () => {
   return (
@@ -39,12 +40,21 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-            <Button variant="hero" size="lg" className="group">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="group"
+              onClick={() => scrollToSection('cta')}
+            >
               Start Your Journey
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
-            <Button variant="outline" size="lg">
-              Explore Success Stories
+            <Button 
+              variant="outline" 
+              size="lg"
+              onClick={() => scrollToSection('features')}
+            >
+              Explore Features
             </Button>
           </div>
 

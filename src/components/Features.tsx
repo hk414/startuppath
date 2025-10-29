@@ -33,7 +33,7 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="py-24 px-4 bg-background">
+    <section id="features" className="py-24 px-4 bg-background scroll-mt-20">{/* Added id and scroll-mt for header offset */}
       <div className="container max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
