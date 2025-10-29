@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { Calendar, Clock, X, Video } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface SessionSchedulerProps {
   matchId: string;
@@ -21,6 +22,7 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
   const [loading, setLoading] = useState(false);
   const [mentorEmail, setMentorEmail] = useState("");
   const [menteeEmail, setMenteeEmail] = useState("");
+  const [addToCalendar, setAddToCalendar] = useState(true);
 
   useEffect(() => {
     fetchMatchDetails();
@@ -86,38 +88,45 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
 
       if (sessionError) throw sessionError;
 
-      // Create Google Calendar event automatically
-      const startTime = new Date(scheduledAt).toISOString();
-      const endTime = new Date(
-        new Date(scheduledAt).getTime() + parseInt(duration) * 60000
-      ).toISOString();
+      // Create Google Calendar event if user opted in
+      if (addToCalendar) {
+        const startTime = new Date(scheduledAt).toISOString();
+        const endTime = new Date(
+          new Date(scheduledAt).getTime() + parseInt(duration) * 60000
+        ).toISOString();
 
-      const { data: calendarData, error: calendarError } = await supabase.functions.invoke(
-        'create-calendar-event',
-        {
-          body: {
-            summary: 'Mentorship Session',
-            description: notes || 'Scheduled mentorship session',
-            startTime,
-            endTime,
-            attendees: [mentorEmail, menteeEmail].filter(Boolean),
-          },
+        const { data: calendarData, error: calendarError } = await supabase.functions.invoke(
+          'create-calendar-event',
+          {
+            body: {
+              summary: 'Mentorship Session',
+              description: notes || 'Scheduled mentorship session',
+              startTime,
+              endTime,
+              attendees: [mentorEmail, menteeEmail].filter(Boolean),
+            },
+          }
+        );
+
+        if (!calendarError && calendarData?.meetLink) {
+          // Update session with Google Meet link
+          await supabase
+            .from("mentorship_sessions")
+            .update({ meeting_link: calendarData.meetLink })
+            .eq("id", sessionData.id);
+
+          toast({
+            title: "Session Scheduled! 📅",
+            description: "Added to calendar with Google Meet link.",
+          });
+        } else {
+          console.error('Calendar error:', calendarError);
+          toast({
+            title: "Session Scheduled! 📅",
+            description: "Your mentorship session has been scheduled.",
+          });
         }
-      );
-
-      if (!calendarError && calendarData?.meetLink) {
-        // Update session with Google Meet link
-        await supabase
-          .from("mentorship_sessions")
-          .update({ meeting_link: calendarData.meetLink })
-          .eq("id", sessionData.id);
-
-        toast({
-          title: "Session Scheduled! 📅",
-          description: "Added to calendar with Google Meet link.",
-        });
       } else {
-        console.error('Calendar error:', calendarError);
         toast({
           title: "Session Scheduled! 📅",
           description: "Your mentorship session has been scheduled.",
@@ -196,8 +205,27 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
             placeholder="What do you want to discuss in this session?"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            rows={4}
+          rows={4}
           />
+        </div>
+
+        <div className="flex items-center space-x-2 p-4 bg-secondary/10 rounded-lg">
+          <Checkbox
+            id="add-to-calendar"
+            checked={addToCalendar}
+            onCheckedChange={(checked) => setAddToCalendar(checked as boolean)}
+          />
+          <div className="flex-1">
+            <Label
+              htmlFor="add-to-calendar"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            >
+              Add to Google Calendar
+            </Label>
+            <p className="text-sm text-muted-foreground mt-1">
+              Automatically create calendar event and generate Google Meet link
+            </p>
+          </div>
         </div>
 
         <div className="flex gap-2 pt-4">
