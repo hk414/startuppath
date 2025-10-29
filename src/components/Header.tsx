@@ -30,10 +30,10 @@ const Header = () => {
               How It Works
             </button>
             <button 
-              onClick={() => scrollToSection('cta')}
+              onClick={() => window.location.href = '/guidebook'}
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
             >
-              Get Started
+              Guidebook
             </button>
           </div>
 

@@ -26,8 +26,9 @@ const features = [
   {
     icon: guidebookIcon,
     title: "Guidebook Library",
-    description: "Access curated best practices, frameworks, and case studies from real startup journeys to accelerate your learning.",
+    description: "Access step-by-step startup guides, best practices, case studies, and actionable frameworks from real founders.",
     gradient: "from-primary-glow/10 to-primary/10",
+    link: "/guidebook",
   },
 ];
 
@@ -50,33 +51,41 @@ const Features = () => {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 gap-8">
-          {features.map((feature, index) => (
-            <Card
-              key={index}
-              className={`p-8 border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-strong bg-gradient-to-br ${feature.gradient} group cursor-pointer`}
-            >
-              <div className="flex flex-col items-start gap-6">
-                {/* Icon */}
-                <div className="w-16 h-16 rounded-2xl bg-card shadow-soft flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <img 
-                    src={feature.icon} 
-                    alt={`${feature.title} icon`} 
-                    className="w-10 h-10"
-                  />
-                </div>
+          {features.map((feature, index) => {
+            const CardWrapper = feature.link ? 'a' : 'div';
+            const cardProps: any = feature.link 
+              ? { href: feature.link, className: "block" }
+              : {};
+            
+            return (
+              <CardWrapper key={index} {...cardProps}>
+                <Card
+                  className={`p-8 border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-strong bg-gradient-to-br ${feature.gradient} group cursor-pointer`}
+                >
+                  <div className="flex flex-col items-start gap-6">
+                    {/* Icon */}
+                    <div className="w-16 h-16 rounded-2xl bg-card shadow-soft flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <img 
+                        src={feature.icon} 
+                        alt={`${feature.title} icon`} 
+                        className="w-10 h-10"
+                      />
+                    </div>
 
-                {/* Content */}
-                <div className="space-y-3">
-                  <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          ))}
+                    {/* Content */}
+                    <div className="space-y-3">
+                      <h3 className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                        {feature.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </CardWrapper>
+            );
+          })}
         </div>
       </div>
     </section>
