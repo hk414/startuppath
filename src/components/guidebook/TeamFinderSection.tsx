@@ -273,15 +273,18 @@ export const TeamFinderSection = () => {
                   
                   <p className="text-sm text-foreground mb-3 line-clamp-2">{member.bio}</p>
                   
-                  <a
-                    href={member.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
                     className="text-sm text-primary hover:underline"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toast({
+                        title: "LinkedIn Profile",
+                        description: "This is a demo profile. In a real app, this would link to their actual LinkedIn.",
+                      });
+                    }}
                   >
                     View LinkedIn Profile →
-                  </a>
+                  </button>
                 </div>
               </div>
               
