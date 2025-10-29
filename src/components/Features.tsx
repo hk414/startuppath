@@ -28,7 +28,6 @@ const features = [
     title: "Guidebook Library",
     description: "Access step-by-step startup guides, best practices, case studies, and actionable frameworks from real founders.",
     gradient: "from-primary-glow/10 to-primary/10",
-    link: "/guidebook",
   },
 ];
 
@@ -51,17 +50,11 @@ const Features = () => {
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 gap-8">
-          {features.map((feature, index) => {
-            const CardWrapper = feature.link ? 'a' : 'div';
-            const cardProps: any = feature.link 
-              ? { href: feature.link, className: "block" }
-              : {};
-            
-            return (
-              <CardWrapper key={index} {...cardProps}>
-                <Card
-                  className={`p-8 border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-strong bg-gradient-to-br ${feature.gradient} group cursor-pointer`}
-                >
+          {features.map((feature, index) => (
+            <Card
+              key={index}
+              className={`p-8 border-2 hover:border-primary/30 transition-all duration-300 hover:shadow-strong bg-gradient-to-br ${feature.gradient} group`}
+            >
                   <div className="flex flex-col items-start gap-6">
                     {/* Icon */}
                     <div className="w-16 h-16 rounded-2xl bg-card shadow-soft flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -82,10 +75,8 @@ const Features = () => {
                       </p>
                     </div>
                   </div>
-                </Card>
-              </CardWrapper>
-            );
-          })}
+            </Card>
+          ))}
         </div>
       </div>
     </section>
