@@ -326,6 +326,62 @@ const Guidebook = () => {
     }
   };
 
+  const transcribeAndAnalyze = async () => {
+    if (!audioBlob) {
+      toast({
+        title: "No recording found",
+        description: "Please record your pitch first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      
+      const base64Audio = await new Promise<string>((resolve) => {
+        reader.onloadend = () => {
+          const base64 = reader.result as string;
+          resolve(base64.split(',')[1]);
+        };
+      });
+
+      // Transcribe audio
+      const { data: transcribeData, error: transcribeError } = await supabase.functions.invoke('transcribe-audio', {
+        body: { audio: base64Audio }
+      });
+
+      if (transcribeError) throw transcribeError;
+
+      const transcribedText = transcribeData.text;
+      setPitchText(transcribedText);
+
+      // Analyze the transcribed pitch
+      const { data: analyzeData, error: analyzeError } = await supabase.functions.invoke('analyze-pitch', {
+        body: { pitch: transcribedText }
+      });
+
+      if (analyzeError) throw analyzeError;
+
+      setPitchFeedback(analyzeData.feedback);
+      toast({
+        title: "Recording Analyzed! 🎯",
+        description: "Your pitch has been transcribed and analyzed.",
+      });
+    } catch (error) {
+      toast({
+        title: "Analysis Failed",
+        description: "Could not transcribe or analyze recording.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   if (!selectedStage) {
     return (
       <div className="min-h-screen bg-gradient-subtle p-6">
@@ -546,26 +602,43 @@ const Guidebook = () => {
                             </Button>
                           )}
                           
-                          <Button
-                            onClick={analyzePitch}
-                            disabled={isAnalyzing || !pitchText.trim()}
-                            className="flex-1"
-                          >
-                            {isAnalyzing ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Analyzing...
-                              </>
-                            ) : (
-                              "Get AI Feedback"
-                            )}
-                          </Button>
+                          {audioBlob ? (
+                            <Button
+                              onClick={transcribeAndAnalyze}
+                              disabled={isAnalyzing}
+                              className="flex-1"
+                            >
+                              {isAnalyzing ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Analyzing...
+                                </>
+                              ) : (
+                                "Analyze Recording"
+                              )}
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={analyzePitch}
+                              disabled={isAnalyzing || !pitchText.trim()}
+                              className="flex-1"
+                            >
+                              {isAnalyzing ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Analyzing...
+                                </>
+                              ) : (
+                                "Get AI Feedback"
+                              )}
+                            </Button>
+                          )}
                         </div>
 
                         {audioBlob && !isRecording && (
                           <div className="bg-secondary/10 rounded p-3">
-                            <p className="text-sm text-secondary-foreground">
-                              ✅ Recording saved! Write your pitch above or record again to replace.
+                            <p className="text-sm text-foreground">
+                              ✅ Recording saved! Click "Analyze Recording" to get AI feedback, or record again to replace.
                             </p>
                           </div>
                         )}
