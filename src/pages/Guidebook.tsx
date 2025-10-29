@@ -434,6 +434,29 @@ const Guidebook = () => {
               ))}
             </div>
           </div>
+
+          {/* Team Finder Card */}
+          <Card className="p-8 bg-gradient-hero/10 border-primary/20 hover:shadow-strong transition-all">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                <Users className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold text-foreground">
+                🚀 Find Your Dream Team
+              </h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Discover potential co-founders and team members. Schedule coffee chats and build your startup team!
+              </p>
+              <Button 
+                onClick={() => navigate('/team-finder')}
+                size="lg"
+                className="gap-2"
+              >
+                <Users className="w-5 h-5" />
+                Explore Team Finder
+              </Button>
+            </div>
+          </Card>
         </div>
       </div>
     );
