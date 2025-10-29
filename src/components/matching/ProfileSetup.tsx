@@ -41,6 +41,27 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
 
   const handleSubmit = async () => {
     try {
+      // Validation
+      if (profileType === "mentor") {
+        if (!title || expertise.length === 0) {
+          toast({
+            title: "Missing Information",
+            description: "Please fill in your title and select at least one expertise area.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else {
+        if (!industry || !startupStage || goals.length === 0 || challenges.length === 0) {
+          toast({
+            title: "Missing Information",
+            description: "Please fill in industry, stage, and add at least one goal and challenge.",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       if (profileType === "mentor") {
         const { error } = await supabase.from('mentor_profiles').insert({
           user_id: userId,
@@ -49,14 +70,17 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
           bio,
           expertise_areas: expertise as any,
           industries,
-          years_experience: parseInt(yearsExp),
+          years_experience: parseInt(yearsExp) || null,
           availability,
           timezone,
           linkedin_url: linkedinUrl,
           is_active: true
         } as any);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Mentor profile error:", error);
+          throw error;
+        }
       } else {
         const { error } = await supabase.from('mentee_profiles').insert({
           user_id: userId,
@@ -68,7 +92,10 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
           timezone
         } as any);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Mentee profile error:", error);
+          throw error;
+        }
       }
 
       toast({
@@ -77,12 +104,14 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
       });
 
       onComplete();
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage = error?.message || "Failed to create profile. Please try again.";
       toast({
-        title: "Error",
-        description: "Failed to create profile. Please try again.",
+        title: "Error Creating Profile",
+        description: errorMessage,
         variant: "destructive",
       });
+      console.error("Profile creation error:", error);
     }
   };
 
@@ -292,6 +321,68 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
                   onChange={(e) => setTimezone(e.target.value)}
                   placeholder="EST, PST, etc."
                 />
+              </div>
+
+              <div>
+                <Label>Goals (at least one required)</Label>
+                <div className="space-y-2 mt-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Add a goal (e.g., Raise seed funding)"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          const value = e.currentTarget.value.trim();
+                          if (value && !goals.includes(value)) {
+                            setGoals([...goals, value]);
+                            e.currentTarget.value = '';
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {goals.map((goal, idx) => (
+                      <Badge key={idx} variant="secondary">
+                        {goal}
+                        <X
+                          className="ml-1 h-3 w-3 cursor-pointer"
+                          onClick={() => setGoals(goals.filter((_, i) => i !== idx))}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label>Challenges (at least one required)</Label>
+                <div className="space-y-2 mt-2">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Add a challenge (e.g., Finding product-market fit)"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          const value = e.currentTarget.value.trim();
+                          if (value && !challenges.includes(value)) {
+                            setChallenges([...challenges, value]);
+                            e.currentTarget.value = '';
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {challenges.map((challenge, idx) => (
+                      <Badge key={idx} variant="secondary">
+                        {challenge}
+                        <X
+                          className="ml-1 h-3 w-3 cursor-pointer"
+                          onClick={() => setChallenges(challenges.filter((_, i) => i !== idx))}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
             </>
           )}
