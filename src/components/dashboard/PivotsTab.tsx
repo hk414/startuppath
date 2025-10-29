@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit2, Trash2, Sparkles, TrendingUp, Loader2, FileText, Download } from "lucide-react";
+import { Plus, Edit2, Trash2, Sparkles, TrendingUp, Loader2, FileText, Download, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import JourneyTimeline from "./JourneyTimeline";
 import ReactMarkdown from 'react-markdown';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import pptxgen from 'pptxgenjs';
@@ -51,8 +52,12 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [startupName, setStartupName] = useState("");
   const [currentStage, setCurrentStage] = useState("");
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  // Dummy premium check - hardcoded as false
+  const isPremiumUser = false;
 
   useEffect(() => {
     fetchPivots();
@@ -166,6 +171,11 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   };
 
   const generateAIInsights = async () => {
+    if (!isPremiumUser) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     if (pivots.length === 0) {
       toast({
         title: "No pivots to analyze",
@@ -200,6 +210,11 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   };
 
   const generateInvestorReport = async () => {
+    if (!isPremiumUser) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     if (pivots.length === 0) {
       toast({
         title: "No pivots to analyze",
@@ -357,6 +372,56 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
           <p className="text-muted-foreground">Track your journey and document strategic decisions</p>
         </div>
       </div>
+
+      {/* Premium Modal */}
+      <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Crown className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <DialogTitle className="text-center text-2xl">Premium Feature</DialogTitle>
+            <DialogDescription className="text-center space-y-4 pt-4">
+              <p className="text-base">
+                AI Insights and Investor Reports are premium features available to subscribers.
+              </p>
+              <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                <p className="font-semibold text-foreground">Premium includes:</p>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>✨ AI-powered pivot analysis</li>
+                  <li>📊 Professional investor reports</li>
+                  <li>📄 Export to PDF, PPTX & Markdown</li>
+                  <li>🎯 Personalized recommendations</li>
+                </ul>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowPremiumModal(false)}
+              className="flex-1"
+            >
+              Maybe Later
+            </Button>
+            <Button
+              onClick={() => {
+                setShowPremiumModal(false);
+                toast({
+                  title: "Coming Soon! 🚀",
+                  description: "Premium subscription will be available shortly.",
+                });
+              }}
+              className="flex-1"
+            >
+              <Crown className="w-4 h-4 mr-2" />
+              Upgrade to Premium
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Tabs defaultValue="timeline" className="w-full">
         <TabsList className="grid w-full max-w-md grid-cols-2">
@@ -564,7 +629,13 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                     <Sparkles className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-heading font-semibold text-foreground">AI Insights</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-heading font-semibold text-foreground">AI Insights</h3>
+                      <Badge variant="secondary" className="text-xs">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Premium
+                      </Badge>
+                    </div>
                     <p className="text-sm text-muted-foreground">Patterns from your pivot journey</p>
                   </div>
                 </div>
@@ -613,7 +684,13 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                     <FileText className="w-5 h-5 text-secondary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-heading font-semibold text-foreground">Investor Report</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-heading font-semibold text-foreground">Investor Report</h3>
+                      <Badge variant="secondary" className="text-xs">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Premium
+                      </Badge>
+                    </div>
                     <p className="text-sm text-muted-foreground">Generate professional presentation</p>
                   </div>
                 </div>
