@@ -24,15 +24,25 @@ const ProblemSolverGame = ({ userId, onXpEarned }: ProblemSolverGameProps) => {
   }, []);
 
   const loadScenario = async () => {
-    const { data, error } = await supabase
+    // Fetch all scenarios
+    const { data: scenarios, error } = await supabase
       .from('problem_scenarios')
-      .select('*')
-      .order('week_starting', { ascending: false })
-      .limit(1)
-      .single();
+      .select('*');
 
-    if (!error && data) {
-      setScenario(data);
+    if (!error && scenarios && scenarios.length > 0) {
+      // Filter out the current scenario if it exists
+      const availableScenarios = scenario 
+        ? scenarios.filter(s => s.id !== scenario.id)
+        : scenarios;
+      
+      // If all scenarios have been used, reset to full list
+      const scenarioPool = availableScenarios.length > 0 ? availableScenarios : scenarios;
+      
+      // Randomly select a scenario
+      const randomIndex = Math.floor(Math.random() * scenarioPool.length);
+      const selectedScenario = scenarioPool[randomIndex];
+      
+      setScenario(selectedScenario);
       setHasAnswered(false);
       setSelectedOption("");
     }
