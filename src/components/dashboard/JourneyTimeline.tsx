@@ -23,13 +23,46 @@ interface JourneyTimelineProps {
 }
 
 const STAGES = [
-  { value: "idea", label: "💡 Idea", description: "Brainstorming and ideation" },
-  { value: "validation", label: "🔍 Validation", description: "Market research and validation" },
-  { value: "building", label: "🛠️ Building", description: "Product development" },
-  { value: "testing", label: "🧪 Testing", description: "User testing and feedback" },
-  { value: "launch", label: "🚀 Launch", description: "Going live" },
-  { value: "growth", label: "📈 Growth", description: "User acquisition and retention" },
-  { value: "scaling", label: "🌟 Scaling", description: "Expanding and optimizing" },
+  { 
+    value: "idea", 
+    label: "💡 Problem Discovery", 
+    description: "Identify a real problem worth solving. Talk to potential users, understand their pain points, and validate that the problem is significant enough that people would pay to solve it."
+  },
+  { 
+    value: "validation", 
+    label: "🔍 Market Validation", 
+    description: "Test your assumptions before building. Conduct customer interviews, create landing pages, run surveys, and get pre-orders or letters of intent. Aim for at least 10-20 conversations with potential customers."
+  },
+  { 
+    value: "building", 
+    label: "🛠️ MVP Development", 
+    description: "Build the minimum viable product - the simplest version that solves the core problem. Focus on one key feature that delivers value. Resist the urge to build everything at once. Target: 4-12 weeks to first version."
+  },
+  { 
+    value: "testing", 
+    label: "🧪 Beta Testing", 
+    description: "Get your MVP into the hands of 5-20 early adopters. Watch them use it, gather feedback, identify bugs, and understand what features truly matter. Iterate quickly based on real user behavior, not assumptions."
+  },
+  { 
+    value: "launch", 
+    label: "🚀 Public Launch", 
+    description: "Launch on Product Hunt, Hacker News, or relevant communities. Focus on distribution channels where your target users already hang out. Set realistic goals: 100-500 signups in first week is a solid start."
+  },
+  { 
+    value: "traction", 
+    label: "📊 Early Traction", 
+    description: "Achieve product-market fit indicators: users returning weekly, organic referrals, or paying customers. Track key metrics: retention rate (>40% month 1), NPS score (>30), and customer acquisition cost vs lifetime value."
+  },
+  { 
+    value: "growth", 
+    label: "📈 Scaling Growth", 
+    description: "Double down on channels that work. Build repeatable acquisition processes, improve onboarding, and reduce churn. Focus on one or two growth channels until you hit $10k-50k MRR before diversifying."
+  },
+  { 
+    value: "scaling", 
+    label: "🌟 Business Scaling", 
+    description: "Scale team, infrastructure, and operations. Hire key roles, automate processes, and expand to new markets or segments. Consider fundraising if capital can accelerate growth. Typical milestone: $100k+ MRR, strong unit economics."
+  },
 ];
 
 const JourneyTimeline = ({ userId }: JourneyTimelineProps) => {
