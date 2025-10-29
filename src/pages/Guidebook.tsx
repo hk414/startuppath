@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import { 
   Lightbulb, 
   Users, 
@@ -11,7 +15,11 @@ import {
   CheckCircle2,
   ChevronRight,
   Award,
-  BookOpen
+  BookOpen,
+  Home,
+  Mic,
+  Square,
+  Loader2
 } from "lucide-react";
 
 const stages = [
@@ -219,9 +227,17 @@ const guideContent: Record<string, GuideSection[]> = {
 };
 
 const Guidebook = () => {
+  const navigate = useNavigate();
   const [selectedStage, setSelectedStage] = useState<string | null>(null);
   const [completedSections, setCompletedSections] = useState<Set<string>>(new Set());
   const [expandedSection, setExpandedSection] = useState<number | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [pitchFeedback, setPitchFeedback] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [pitchText, setPitchText] = useState("");
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
 
   const handleCompleteSection = (sectionIndex: number) => {
     const key = `${selectedStage}-${sectionIndex}`;
@@ -234,10 +250,95 @@ const Guidebook = () => {
     setCompletedSections(newCompleted);
   };
 
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        setAudioBlob(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+
+      // Auto-stop after 2 minutes
+      setTimeout(() => {
+        if (mediaRecorderRef.current?.state === 'recording') {
+          stopRecording();
+        }
+      }, 120000);
+    } catch (error) {
+      toast({
+        title: "Microphone Error",
+        description: "Could not access microphone. Please check permissions.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const analyzePitch = async () => {
+    if (!pitchText.trim()) {
+      toast({
+        title: "No pitch provided",
+        description: "Please write your pitch or record one first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-pitch', {
+        body: { pitch: pitchText }
+      });
+
+      if (error) throw error;
+
+      setPitchFeedback(data.feedback);
+      toast({
+        title: "Analysis Complete! 🎯",
+        description: "Check your personalized pitch feedback below.",
+      });
+    } catch (error) {
+      toast({
+        title: "Analysis Failed",
+        description: "Could not analyze pitch. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   if (!selectedStage) {
     return (
       <div className="min-h-screen bg-gradient-subtle p-6">
         <div className="max-w-4xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="mb-6"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+
           <div className="text-center mb-12 space-y-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-light border border-accent/20 text-accent text-sm font-medium">
               <BookOpen className="w-4 h-4" />
@@ -406,6 +507,75 @@ const Guidebook = () => {
                           📚 Deep Dive
                         </h4>
                         <p className="text-muted-foreground text-sm">{section.deepDive}</p>
+                      </div>
+                    )}
+
+                     {/* Pitch Practice - Only for "Pitching Like a Pro" section */}
+                    {selectedStage === 'funding' && section.title === 'Pitching Like a Pro' && (
+                      <div className="bg-gradient-hero/5 rounded-lg p-6 space-y-4">
+                        <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                          <Mic className="w-5 h-5 text-primary" />
+                          Practice Your Pitch (Up to 2 minutes)
+                        </h4>
+                        
+                        <Textarea
+                          placeholder="Type or paste your pitch here... (or record below)"
+                          value={pitchText}
+                          onChange={(e) => setPitchText(e.target.value)}
+                          className="min-h-[120px]"
+                        />
+
+                        <div className="flex gap-2">
+                          {!isRecording ? (
+                            <Button
+                              onClick={startRecording}
+                              variant="outline"
+                              className="flex-1"
+                            >
+                              <Mic className="w-4 h-4 mr-2" />
+                              Record Pitch
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={stopRecording}
+                              variant="destructive"
+                              className="flex-1"
+                            >
+                              <Square className="w-4 h-4 mr-2" />
+                              Stop Recording
+                            </Button>
+                          )}
+                          
+                          <Button
+                            onClick={analyzePitch}
+                            disabled={isAnalyzing || !pitchText.trim()}
+                            className="flex-1"
+                          >
+                            {isAnalyzing ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Analyzing...
+                              </>
+                            ) : (
+                              "Get AI Feedback"
+                            )}
+                          </Button>
+                        </div>
+
+                        {audioBlob && !isRecording && (
+                          <div className="bg-secondary/10 rounded p-3">
+                            <p className="text-sm text-secondary-foreground">
+                              ✅ Recording saved! Write your pitch above or record again to replace.
+                            </p>
+                          </div>
+                        )}
+
+                        {pitchFeedback && (
+                          <div className="bg-primary/5 rounded-lg p-4 border-l-4 border-primary">
+                            <h5 className="font-semibold text-foreground mb-2">🎯 Your Pitch Feedback:</h5>
+                            <div className="text-sm text-foreground whitespace-pre-wrap">{pitchFeedback}</div>
+                          </div>
+                        )}
                       </div>
                     )}
 

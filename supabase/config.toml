@@ -1,1 +1,7 @@
 project_id = "gzdxhuoqbfueciclrvxo"
+
+[functions.analyze-pitch]
+verify_jwt = false
+
+[functions.mentor-chat]
+verify_jwt = false
