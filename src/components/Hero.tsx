@@ -2,8 +2,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, TrendingUp, Users, Zap } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import scrollToSection from "@/utils/scrollToSection";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Hero = () => {
+  const { t } = useLanguage();
+  
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Premium Background with Advanced Overlays */}
@@ -36,28 +39,28 @@ const Hero = () => {
           {/* Premium Badge with Glow */}
           <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-accent-light to-primary/10 border border-primary/20 text-primary-deep dark:text-primary font-semibold shadow-glow backdrop-blur-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
             <Sparkles className="w-5 h-5 animate-pulse" />
-            <span className="text-sm tracking-wide">Turn Every Pivot Into Shared Wisdom</span>
+            <span className="text-sm tracking-wide">{t('hero.badge')}</span>
           </div>
 
           {/* Premium Main Heading with Better Typography */}
           <h1 className="text-6xl md:text-8xl font-black tracking-tight leading-[1.1] text-foreground animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-            Document Your{" "}
+            {t('hero.title1')}{" "}
             <span className="relative inline-block">
               <span className="bg-gradient-hero bg-clip-text text-transparent">
-                Startup Journey
+                {t('hero.title2')}
               </span>
               <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-hero blur-sm" />
             </span>
             <br />
             <span className="text-5xl md:text-7xl bg-gradient-to-r from-secondary via-secondary to-secondary/80 bg-clip-text text-transparent">
-              Accelerate Innovation
+              {t('hero.title3')}
             </span>
           </h1>
 
           {/* Premium Subheading */}
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-            Transform every decision, pivot, and breakthrough into{" "}
-            <span className="text-foreground font-semibold">actionable insights</span> that power the entire entrepreneurial ecosystem.
+            {t('hero.subtitle')}{" "}
+            <span className="text-foreground font-semibold">{t('hero.subtitleBold')}</span> {t('hero.subtitleEnd')}
           </p>
 
           {/* Premium CTA Buttons with Enhanced Styling */}
@@ -69,7 +72,7 @@ const Hero = () => {
               onClick={() => scrollToSection('cta')}
             >
               <Zap className="w-5 h-5 mr-2" />
-              Start Your Journey
+              {t('hero.ctaStart')}
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
             </Button>
             <Button 
@@ -78,7 +81,7 @@ const Hero = () => {
               className="border-2 border-primary/30 hover:border-primary hover:bg-primary/5 shadow-medium hover:shadow-strong transition-all duration-300 px-8 py-7 text-lg font-semibold backdrop-blur-sm"
               onClick={() => scrollToSection('features')}
             >
-              Explore Features
+              {t('hero.ctaExplore')}
             </Button>
           </div>
 
@@ -93,7 +96,7 @@ const Hero = () => {
                   </div>
                 </div>
                 <div className="text-5xl font-black bg-gradient-hero bg-clip-text text-transparent mb-2">500+</div>
-                <div className="text-sm font-medium text-muted-foreground tracking-wide">Startups Tracked</div>
+                <div className="text-sm font-medium text-muted-foreground tracking-wide">{t('hero.stats.startups')}</div>
               </div>
             </div>
             
@@ -106,7 +109,7 @@ const Hero = () => {
                   </div>
                 </div>
                 <div className="text-5xl font-black bg-gradient-accent bg-clip-text text-transparent mb-2">1.2K+</div>
-                <div className="text-sm font-medium text-muted-foreground tracking-wide">Pivots Documented</div>
+                <div className="text-sm font-medium text-muted-foreground tracking-wide">{t('hero.stats.pivots')}</div>
               </div>
             </div>
             
@@ -119,7 +122,7 @@ const Hero = () => {
                   </div>
                 </div>
                 <div className="text-5xl font-black bg-gradient-hero bg-clip-text text-transparent mb-2">300+</div>
-                <div className="text-sm font-medium text-muted-foreground tracking-wide">Mentors Active</div>
+                <div className="text-sm font-medium text-muted-foreground tracking-wide">{t('hero.stats.mentors')}</div>
               </div>
             </div>
           </div>

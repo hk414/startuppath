@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Compass, Menu } from "lucide-react";
 import scrollToSection from "@/utils/scrollToSection";
+import LanguageSelector from "@/components/LanguageSelector";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Header = () => {
+  const { t } = useLanguage();
+  
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
       <div className="container max-w-7xl mx-auto px-4 py-4">
@@ -21,37 +25,38 @@ const Header = () => {
               onClick={() => scrollToSection('features')}
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
             >
-              Features
+              {t('nav.features')}
             </button>
             <button 
               onClick={() => scrollToSection('how-it-works')}
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
             >
-              How It Works
+              {t('nav.howItWorks')}
             </button>
             <button 
               onClick={() => window.location.href = '/guidebook'}
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors cursor-pointer"
             >
-              Guidebook
+              {t('nav.guidebook')}
             </button>
             <button 
               onClick={() => window.location.href = '/challenges'}
               className="text-sm font-medium text-secondary hover:text-secondary/80 transition-colors cursor-pointer"
             >
-              🎮 Challenges
+              {t('nav.challenges')}
             </button>
           </div>
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3">
+            <LanguageSelector />
             <Button 
               variant="ghost" 
               size="sm" 
               className="hidden md:inline-flex"
               onClick={() => window.location.href = '/auth'}
             >
-              Sign In
+              {t('nav.signIn')}
             </Button>
             <Button 
               variant="default" 
@@ -59,7 +64,7 @@ const Header = () => {
               className="shadow-soft"
               onClick={() => window.location.href = '/dashboard'}
             >
-              Dashboard
+              {t('nav.dashboard')}
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="w-5 h-5" />

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Trophy, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import IdeaGeneratorGame from "@/components/challenges/IdeaGeneratorGame";
 import ProblemSolverGame from "@/components/challenges/ProblemSolverGame";
 import StartupSimulationGame from "@/components/challenges/StartupSimulationGame";
@@ -20,6 +21,7 @@ import {
 const Challenges = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [userStats, setUserStats] = useState<any>(null);
@@ -77,18 +79,18 @@ const Challenges = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Trophy className="w-6 h-6 text-primary" />
-              Join Startup Challenges
+              {t('challenges.authDialog.title')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-4 pt-4">
               <p className="text-base">
-                Please log in or create an account to join Startup Challenges and track your progress!
+                {t('challenges.authDialog.description')}
               </p>
               <div className="flex gap-3">
                 <Button onClick={handleAuthRedirect} className="flex-1">
-                  Sign In / Sign Up
+                  {t('challenges.authDialog.signIn')}
                 </Button>
                 <Button variant="outline" onClick={() => navigate('/')} className="flex-1">
-                  Go Back
+                  {t('challenges.authDialog.goBack')}
                 </Button>
               </div>
             </AlertDialogDescription>
@@ -118,10 +120,10 @@ const Challenges = () => {
               </Button>
               <div>
                 <h1 className="text-3xl font-black bg-gradient-hero bg-clip-text text-transparent">
-                  Startup Challenges Arena
+                  {t('challenges.title')}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Play games, earn XP, and level up your entrepreneurial skills
+                  {t('challenges.subtitle')}
                 </p>
               </div>
             </div>
@@ -129,12 +131,12 @@ const Challenges = () => {
             {/* User Stats Badge */}
             <div className="flex items-center gap-6 bg-gradient-card border border-border rounded-2xl px-6 py-3 shadow-medium">
               <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Level</div>
+                <div className="text-xs text-muted-foreground mb-1">{t('challenges.level')}</div>
                 <div className="text-lg font-bold text-primary uppercase">{userStats.level}</div>
               </div>
               <div className="w-px h-10 bg-border" />
               <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Total XP</div>
+                <div className="text-xs text-muted-foreground mb-1">{t('challenges.totalXP')}</div>
                 <div className="text-lg font-bold flex items-center gap-1">
                   <Zap className="w-4 h-4 text-secondary" />
                   {userStats.total_xp}
@@ -151,11 +153,11 @@ const Challenges = () => {
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 h-14">
             <TabsTrigger value="games" className="text-base">
               <Trophy className="w-5 h-5 mr-2" />
-              Games
+              {t('challenges.tabs.games')}
             </TabsTrigger>
             <TabsTrigger value="leaderboard" className="text-base">
               <Zap className="w-5 h-5 mr-2" />
-              Leaderboard
+              {t('challenges.tabs.leaderboard')}
             </TabsTrigger>
           </TabsList>
 
