@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Plus, Edit2, Trash2, Sparkles, TrendingUp, Loader2, FileText, Download, Crown } from "lucide-react";
+import { Plus, Edit2, Trash2, Sparkles, TrendingUp, Loader2, FileText, Download, Crown, Lock, CheckCircle2, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
@@ -53,11 +53,14 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   const [startupName, setStartupName] = useState("");
   const [currentStage, setCurrentStage] = useState("");
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumStep, setPremiumStep] = useState<'info' | 'payment' | 'success'>('info');
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [cardName, setCardName] = useState("");
   const reportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  
-  // Dummy premium check - hardcoded as false
-  const isPremiumUser = false;
 
   useEffect(() => {
     fetchPivots();
@@ -364,6 +367,27 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
     }
   };
 
+  const handlePayment = () => {
+    // Simulate payment processing
+    setTimeout(() => {
+      setPremiumStep('success');
+      setTimeout(() => {
+        setIsPremiumUser(true);
+        setShowPremiumModal(false);
+        setPremiumStep('info');
+        // Reset form
+        setCardNumber("");
+        setExpiryDate("");
+        setCvv("");
+        setCardName("");
+        toast({
+          title: "Welcome to Premium! 🎉",
+          description: "You now have access to all premium features.",
+        });
+      }, 2000);
+    }, 1500);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -374,52 +398,170 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
       </div>
 
       {/* Premium Modal */}
-      <Dialog open={showPremiumModal} onOpenChange={setShowPremiumModal}>
+      <Dialog open={showPremiumModal} onOpenChange={(open) => {
+        setShowPremiumModal(open);
+        if (!open) {
+          setPremiumStep('info');
+          setCardNumber("");
+          setExpiryDate("");
+          setCvv("");
+          setCardName("");
+        }
+      }}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Crown className="w-8 h-8 text-white" />
+          {premiumStep === 'info' && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                    <Crown className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                <DialogTitle className="text-center text-2xl">Upgrade to Premium</DialogTitle>
+                <DialogDescription className="text-center space-y-4 pt-4">
+                  <p className="text-base">
+                    Unlock AI Insights and Investor Reports with Premium.
+                  </p>
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                    <p className="font-semibold text-foreground">Premium includes:</p>
+                    <ul className="text-sm space-y-1 text-muted-foreground">
+                      <li>✨ AI-powered pivot analysis</li>
+                      <li>📊 Professional investor reports</li>
+                      <li>📄 Export to PDF, PPTX & Markdown</li>
+                      <li>🎯 Personalized recommendations</li>
+                    </ul>
+                  </div>
+                  <div className="pt-2">
+                    <p className="text-2xl font-bold text-foreground">$29/month</p>
+                    <p className="text-sm text-muted-foreground">Cancel anytime</p>
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex gap-3 mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPremiumModal(false)}
+                  className="flex-1"
+                >
+                  Maybe Later
+                </Button>
+                <Button
+                  onClick={() => setPremiumStep('payment')}
+                  className="flex-1"
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Continue
+                </Button>
               </div>
-            </div>
-            <DialogTitle className="text-center text-2xl">Premium Feature</DialogTitle>
-            <DialogDescription className="text-center space-y-4 pt-4">
-              <p className="text-base">
-                AI Insights and Investor Reports are premium features available to subscribers.
-              </p>
-              <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                <p className="font-semibold text-foreground">Premium includes:</p>
-                <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>✨ AI-powered pivot analysis</li>
-                  <li>📊 Professional investor reports</li>
-                  <li>📄 Export to PDF, PPTX & Markdown</li>
-                  <li>🎯 Personalized recommendations</li>
-                </ul>
+            </>
+          )}
+
+          {premiumStep === 'payment' && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl">Payment Details</DialogTitle>
+                <DialogDescription className="text-center">
+                  Enter your payment information to complete upgrade
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="card-name">Cardholder Name</Label>
+                  <Input
+                    id="card-name"
+                    placeholder="John Doe"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="card-number">Card Number</Label>
+                  <div className="relative">
+                    <Input
+                      id="card-number"
+                      placeholder="1234 5678 9012 3456"
+                      value={cardNumber}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\s/g, '');
+                        const formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+                        setCardNumber(formatted);
+                      }}
+                      maxLength={19}
+                    />
+                    <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="expiry">Expiry Date</Label>
+                    <Input
+                      id="expiry"
+                      placeholder="MM/YY"
+                      value={expiryDate}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        if (value.length >= 2) {
+                          setExpiryDate(value.slice(0, 2) + '/' + value.slice(2, 4));
+                        } else {
+                          setExpiryDate(value);
+                        }
+                      }}
+                      maxLength={5}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="cvv">CVV</Label>
+                    <Input
+                      id="cvv"
+                      placeholder="123"
+                      type="password"
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, ''))}
+                      maxLength={3}
+                    />
+                  </div>
+                </div>
               </div>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-3 mt-4">
-            <Button
-              variant="outline"
-              onClick={() => setShowPremiumModal(false)}
-              className="flex-1"
-            >
-              Maybe Later
-            </Button>
-            <Button
-              onClick={() => {
-                setShowPremiumModal(false);
-                toast({
-                  title: "Coming Soon! 🚀",
-                  description: "Premium subscription will be available shortly.",
-                });
-              }}
-              className="flex-1"
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Upgrade to Premium
-            </Button>
-          </div>
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setPremiumStep('info')}
+                  className="flex-1"
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={handlePayment}
+                  disabled={!cardName || cardNumber.length < 19 || expiryDate.length < 5 || cvv.length < 3}
+                  className="flex-1"
+                >
+                  <Lock className="w-4 h-4 mr-2" />
+                  Pay $29
+                </Button>
+              </div>
+            </>
+          )}
+
+          {premiumStep === 'success' && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center animate-in zoom-in duration-300">
+                    <CheckCircle2 className="w-10 h-10 text-green-500" />
+                  </div>
+                </div>
+                <DialogTitle className="text-center text-2xl">Payment Successful!</DialogTitle>
+                <DialogDescription className="text-center space-y-4 pt-4">
+                  <p className="text-base text-foreground">
+                    Welcome to Premium! 🎉
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    You now have access to all premium features including AI Insights and Investor Reports.
+                  </p>
+                </DialogDescription>
+              </DialogHeader>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -642,11 +784,17 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                 
                 <Button 
                   onClick={generateAIInsights}
-                  disabled={isAnalyzing}
+                  disabled={isAnalyzing || !isPremiumUser}
                   className="w-full"
                   size="lg"
+                  variant={!isPremiumUser ? "outline" : "default"}
                 >
-                  {isAnalyzing ? (
+                  {!isPremiumUser ? (
+                    <>
+                      <Lock className="w-4 h-4 mr-2" />
+                      Locked - Upgrade to Premium
+                    </>
+                  ) : isAnalyzing ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       Analyzing...
@@ -698,11 +846,17 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                 <div className="space-y-2">
                   <Button 
                     onClick={generateInvestorReport}
-                    disabled={generatingReport}
+                    disabled={generatingReport || !isPremiumUser}
                     className="w-full"
                     size="lg"
+                    variant={!isPremiumUser ? "outline" : "default"}
                   >
-                    {generatingReport ? (
+                    {!isPremiumUser ? (
+                      <>
+                        <Lock className="w-4 h-4 mr-2" />
+                        Locked - Upgrade to Premium
+                      </>
+                    ) : generatingReport ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         Generating...
