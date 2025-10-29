@@ -657,71 +657,27 @@ const Guidebook = () => {
                       </div>
                     )}
 
-                    {/* Navigation and Complete Buttons */}
-                    <div className="flex gap-3 items-center">
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const prevIndex = index - 1;
-                          if (prevIndex >= 0) {
-                            setExpandedSection(prevIndex);
-                            // Scroll to the previous section smoothly
-                            setTimeout(() => {
-                              const element = document.querySelectorAll('[role="region"]')[prevIndex];
-                              element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 100);
-                          }
-                        }}
-                        variant="outline"
-                        disabled={index === 0}
-                        className="flex-1"
-                      >
-                        <ChevronLeft className="w-4 h-4 mr-2" />
-                        Previous
-                      </Button>
-
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCompleteSection(index);
-                        }}
-                        variant={isCompleted ? "secondary" : "default"}
-                        className="flex-[2]"
-                      >
-                        {isCompleted ? (
-                          <>
-                            <CheckCircle2 className="w-4 h-4 mr-2" />
-                            {section.badge}
-                          </>
-                        ) : (
-                          <>
-                            <Award className="w-4 h-4 mr-2" />
-                            Mark Complete
-                          </>
-                        )}
-                      </Button>
-
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const nextIndex = index + 1;
-                          if (nextIndex < currentContent.length) {
-                            setExpandedSection(nextIndex);
-                            // Scroll to the next section smoothly
-                            setTimeout(() => {
-                              const element = document.querySelectorAll('[role="region"]')[nextIndex];
-                              element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 100);
-                          }
-                        }}
-                        variant="outline"
-                        disabled={index === currentContent.length - 1}
-                        className="flex-1"
-                      >
-                        Next
-                        <ChevronRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
+                    {/* Complete Button */}
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCompleteSection(index);
+                      }}
+                      variant={isCompleted ? "secondary" : "default"}
+                      className="w-full"
+                    >
+                      {isCompleted ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          Completed - {section.badge}
+                        </>
+                      ) : (
+                        <>
+                          <Award className="w-4 h-4 mr-2" />
+                          Mark Complete & Earn Badge: {section.badge}
+                        </>
+                      )}
+                    </Button>
                   </div>
                 )}
               </Card>
