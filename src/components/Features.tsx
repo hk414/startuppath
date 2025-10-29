@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import timelineIcon from "@/assets/timeline-icon.png";
-import treeIcon from "@/assets/tree-icon.png";
+import gameIcon from "@/assets/game-icon.png";
 import mentorIcon from "@/assets/mentor-icon.png";
 import guidebookIcon from "@/assets/guidebook-icon.png";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -16,7 +16,7 @@ const Features = () => {
       gradient: "from-primary/10 to-primary-glow/10",
     },
     {
-      icon: treeIcon,
+      icon: gameIcon,
       title: t('features.challenges.title'),
       description: t('features.challenges.description'),
       gradient: "from-secondary/10 to-secondary/20",
