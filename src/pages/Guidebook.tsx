@@ -21,7 +21,8 @@ import {
   Home,
   Mic,
   Square,
-  Loader2
+  Loader2,
+  FileText
 } from "lucide-react";
 
 const stages = [
@@ -238,6 +239,7 @@ const Guidebook = () => {
   const [pitchFeedback, setPitchFeedback] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [pitchText, setPitchText] = useState("");
+  const [pitchMode, setPitchMode] = useState<"text" | "record">("text");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -574,59 +576,52 @@ const Guidebook = () => {
                     )}
                     {selectedStage === 'funding' && section.title === 'Pitching Like a Pro' && (
                       <div className="bg-gradient-hero/5 rounded-lg p-6 space-y-4">
-                        <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
+                        <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                           <Mic className="w-5 h-5 text-primary" />
-                          Practice Your Pitch (Up to 2 minutes)
+                          Practice Your Pitch
                         </h4>
                         
-                        <Textarea
-                          placeholder="Type or paste your pitch here... (or record below)"
-                          value={pitchText}
-                          onChange={(e) => setPitchText(e.target.value)}
-                          className="min-h-[120px]"
-                        />
+                        {/* Mode Selection */}
+                        <div className="flex gap-2 mb-4">
+                          <Button
+                            onClick={() => {
+                              setPitchMode("text");
+                              setAudioBlob(null);
+                              setPitchFeedback("");
+                            }}
+                            variant={pitchMode === "text" ? "default" : "outline"}
+                            className="flex-1"
+                          >
+                            <FileText className="w-4 h-4 mr-2" />
+                            Type/Paste Pitch
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setPitchMode("record");
+                              setPitchText("");
+                              setPitchFeedback("");
+                            }}
+                            variant={pitchMode === "record" ? "default" : "outline"}
+                            className="flex-1"
+                          >
+                            <Mic className="w-4 h-4 mr-2" />
+                            Record Pitch
+                          </Button>
+                        </div>
 
-                        <div className="flex gap-2">
-                          {!isRecording ? (
-                            <Button
-                              onClick={startRecording}
-                              variant="outline"
-                              className="flex-1"
-                            >
-                              <Mic className="w-4 h-4 mr-2" />
-                              Record Pitch
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={stopRecording}
-                              variant="destructive"
-                              className="flex-1"
-                            >
-                              <Square className="w-4 h-4 mr-2" />
-                              Stop Recording
-                            </Button>
-                          )}
-                          
-                          {audioBlob ? (
-                            <Button
-                              onClick={transcribeAndAnalyze}
-                              disabled={isAnalyzing}
-                              className="flex-1"
-                            >
-                              {isAnalyzing ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Analyzing...
-                                </>
-                              ) : (
-                                "Analyze Recording"
-                              )}
-                            </Button>
-                          ) : (
+                        {/* Text Mode */}
+                        {pitchMode === "text" && (
+                          <>
+                            <Textarea
+                              placeholder="Type or paste your pitch here..."
+                              value={pitchText}
+                              onChange={(e) => setPitchText(e.target.value)}
+                              className="min-h-[200px]"
+                            />
                             <Button
                               onClick={analyzePitch}
                               disabled={isAnalyzing || !pitchText.trim()}
-                              className="flex-1"
+                              className="w-full"
                             >
                               {isAnalyzing ? (
                                 <>
@@ -637,15 +632,63 @@ const Guidebook = () => {
                                 "Get AI Feedback"
                               )}
                             </Button>
-                          )}
-                        </div>
+                          </>
+                        )}
 
-                        {audioBlob && !isRecording && (
-                          <div className="bg-secondary/10 rounded p-3">
-                            <p className="text-sm text-foreground">
-                              ✅ Recording saved! Click "Analyze Recording" to get AI feedback, or record again to replace.
-                            </p>
-                          </div>
+                        {/* Record Mode */}
+                        {pitchMode === "record" && (
+                          <>
+                            <div className="bg-secondary/10 rounded-lg p-4 text-center">
+                              <p className="text-sm text-muted-foreground mb-3">
+                                Record your pitch (up to 2 minutes)
+                              </p>
+                              <div className="flex gap-2">
+                                {!isRecording ? (
+                                  <Button
+                                    onClick={startRecording}
+                                    variant="outline"
+                                    className="flex-1"
+                                  >
+                                    <Mic className="w-4 h-4 mr-2" />
+                                    Start Recording
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    onClick={stopRecording}
+                                    variant="destructive"
+                                    className="flex-1"
+                                  >
+                                    <Square className="w-4 h-4 mr-2" />
+                                    Stop Recording
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+
+                            {audioBlob && !isRecording && (
+                              <>
+                                <div className="bg-secondary/10 rounded p-3">
+                                  <p className="text-sm text-foreground">
+                                    ✅ Recording saved! Click below to analyze.
+                                  </p>
+                                </div>
+                                <Button
+                                  onClick={transcribeAndAnalyze}
+                                  disabled={isAnalyzing}
+                                  className="w-full"
+                                >
+                                  {isAnalyzing ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                      Analyzing...
+                                    </>
+                                  ) : (
+                                    "Analyze Recording"
+                                  )}
+                                </Button>
+                              </>
+                            )}
+                          </>
                         )}
 
                         {pitchFeedback && (
