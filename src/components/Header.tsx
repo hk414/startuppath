@@ -1,15 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import scrollToSection from "@/utils/scrollToSection";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/startuppath-logo.jpg";
 
 const Header = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [fontSize, setFontSize] = useState(100);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsSignedIn(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsSignedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const increaseFontSize = () => {
     const newSize = Math.min(fontSize + 10, 150);
@@ -21,6 +37,15 @@ const Header = () => {
     const newSize = Math.max(fontSize - 10, 80);
     setFontSize(newSize);
     document.documentElement.style.fontSize = `${newSize}%`;
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Signed out",
+      description: "Come back soon to continue your journey!",
+    });
+    window.location.href = '/';
   };
   
   return (
@@ -85,14 +110,25 @@ const Header = () => {
               </Button>
             </div>
             <LanguageSelector />
-            <Button
-              variant="ghost" 
-              size="sm" 
-              className="hidden md:inline-flex"
-              onClick={() => window.location.href = '/auth'}
-            >
-              {t('nav.signIn')}
-            </Button>
+            {isSignedIn ? (
+              <Button
+                variant="ghost" 
+                size="sm" 
+                className="hidden md:inline-flex"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
+            ) : (
+              <Button
+                variant="ghost" 
+                size="sm" 
+                className="hidden md:inline-flex"
+                onClick={() => window.location.href = '/auth'}
+              >
+                {t('nav.signIn')}
+              </Button>
+            )}
             <Button 
               variant="default" 
               size="sm" 
