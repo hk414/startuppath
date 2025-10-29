@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import { Calendar, Clock, X } from "lucide-react";
+import { Calendar, Clock, X, Video } from "lucide-react";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 interface SessionSchedulerProps {
   matchId: string;
@@ -19,6 +20,43 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
   const [notes, setNotes] = useState("");
   const [meetingLink, setMeetingLink] = useState("");
   const [loading, setLoading] = useState(false);
+  const [mentorEmail, setMentorEmail] = useState("");
+  const [menteeEmail, setMenteeEmail] = useState("");
+  const { isGoogleConnected, googleAccessToken, connectGoogle } = useGoogleAuth();
+
+  useEffect(() => {
+    fetchMatchDetails();
+  }, [matchId]);
+
+  const fetchMatchDetails = async () => {
+    const { data: matchData } = await supabase
+      .from("matches")
+      .select(`
+        mentee:mentee_profiles(user_id),
+        mentor:mentor_profiles(user_id)
+      `)
+      .eq("id", matchId)
+      .single();
+
+    if (matchData) {
+      // Fetch user emails
+      const { data: { user } } = await supabase.auth.getUser();
+      const currentUserEmail = user?.email || "";
+
+      const menteeUserId = (matchData as any).mentee?.user_id;
+      const mentorUserId = (matchData as any).mentor?.user_id;
+
+      if (menteeUserId) {
+        const { data: menteeUser } = await supabase.auth.admin.getUserById(menteeUserId);
+        setMenteeEmail(menteeUser?.user?.email || "");
+      }
+
+      if (mentorUserId) {
+        const { data: mentorUser } = await supabase.auth.admin.getUserById(mentorUserId);
+        setMentorEmail(mentorUser?.user?.email || "");
+      }
+    }
+  };
 
   const handleSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,21 +72,66 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.from("mentorship_sessions").insert({
-        match_id: matchId,
-        scheduled_at: scheduledAt,
-        duration_minutes: parseInt(duration),
-        notes,
-        meeting_link: meetingLink,
-        status: "scheduled",
-      });
+      // Create session in database
+      const { data: sessionData, error: sessionError } = await supabase
+        .from("mentorship_sessions")
+        .insert({
+          match_id: matchId,
+          scheduled_at: scheduledAt,
+          duration_minutes: parseInt(duration),
+          notes,
+          meeting_link: meetingLink,
+          status: "scheduled",
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (sessionError) throw sessionError;
 
-      toast({
-        title: "Session Scheduled! 📅",
-        description: "Your mentorship session has been scheduled.",
-      });
+      // Create Google Calendar event if connected
+      if (isGoogleConnected && googleAccessToken) {
+        const startTime = new Date(scheduledAt).toISOString();
+        const endTime = new Date(
+          new Date(scheduledAt).getTime() + parseInt(duration) * 60000
+        ).toISOString();
+
+        const { data: calendarData, error: calendarError } = await supabase.functions.invoke(
+          'create-calendar-event',
+          {
+            body: {
+              summary: 'Mentorship Session',
+              description: notes || 'Scheduled mentorship session',
+              startTime,
+              endTime,
+              attendees: [mentorEmail, menteeEmail].filter(Boolean),
+              accessToken: googleAccessToken,
+            },
+          }
+        );
+
+        if (!calendarError && calendarData?.meetLink) {
+          // Update session with Google Meet link
+          await supabase
+            .from("mentorship_sessions")
+            .update({ meeting_link: calendarData.meetLink })
+            .eq("id", sessionData.id);
+
+          toast({
+            title: "Session Scheduled! 📅",
+            description: "Added to your Google Calendar with Meet link.",
+          });
+        } else {
+          toast({
+            title: "Session Scheduled! 📅",
+            description: "Your mentorship session has been scheduled.",
+          });
+        }
+      } else {
+        toast({
+          title: "Session Scheduled! 📅",
+          description: "Your mentorship session has been scheduled. Connect Google Calendar for automatic calendar invites.",
+        });
+      }
 
       onClose();
     } catch (error: any) {
@@ -70,6 +153,30 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
           <X className="w-4 h-4" />
         </Button>
       </div>
+
+      {!isGoogleConnected && (
+        <div className="mb-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+          <div className="flex items-start gap-3">
+            <Video className="w-5 h-5 text-primary mt-0.5" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground mb-2">
+                Connect Google Calendar
+              </p>
+              <p className="text-sm text-muted-foreground mb-3">
+                Automatically add sessions to your calendar and generate Meet links
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={connectGoogle}
+              >
+                Connect Google
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSchedule} className="space-y-4">
         <div>
