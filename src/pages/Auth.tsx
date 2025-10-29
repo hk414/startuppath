@@ -212,11 +212,11 @@ const Auth = () => {
                       className="text-sm font-normal cursor-pointer"
                     >
                       {t('auth.gdpr.accept')}{" "}
-                      <a href="#" className="text-primary hover:underline">
+                      <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                         {t('auth.gdpr.privacy')}
                       </a>{" "}
                       {t('auth.gdpr.and')}{" "}
-                      <a href="#" className="text-primary hover:underline">
+                      <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                         {t('auth.gdpr.terms')}
                       </a>
                     </Label>

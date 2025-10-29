@@ -24,10 +24,10 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.product')}</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.features')}</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.pricing')}</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.caseStudies')}</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.guidebook')}</a></li>
+              <li><a href="#features" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.features')}</a></li>
+              <li><a href="#how-it-works" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.pricing')}</a></li>
+              <li><a href="#cta" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.caseStudies')}</a></li>
+              <li><a href="/guidebook" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.guidebook')}</a></li>
             </ul>
           </div>
 
@@ -35,10 +35,10 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.company')}</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.about')}</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.blog')}</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.careers')}</a></li>
-              <li><a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.contact')}</a></li>
+              <li><a href="#cta" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.about')}</a></li>
+              <li><a href="#cta" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.blog')}</a></li>
+              <li><a href="#cta" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.careers')}</a></li>
+              <li><a href="#cta" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.contact')}</a></li>
             </ul>
           </div>
         </div>
@@ -49,9 +49,9 @@ const Footer = () => {
             © {currentYear} StartUpPath. {t('footer.copyright')}
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.privacy')}</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.terms')}</a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.cookies')}</a>
+            <a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.privacy')}</a>
+            <a href="/terms" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.terms')}</a>
+            <a href="/privacy#cookies" className="text-muted-foreground hover:text-primary transition-colors">{t('footer.cookies')}</a>
           </div>
         </div>
       </div>
