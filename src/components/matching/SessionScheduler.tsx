@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { Calendar, Clock, X, Video } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useGoogleAuth } from "@/hooks/useGoogleAuth";
 
 interface SessionSchedulerProps {
   matchId: string;
@@ -23,6 +24,8 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
   const [mentorEmail, setMentorEmail] = useState("");
   const [menteeEmail, setMenteeEmail] = useState("");
   const [addToCalendar, setAddToCalendar] = useState(true);
+
+  const { isGoogleConnected, googleAccessToken, connectGoogle } = useGoogleAuth();
 
   useEffect(() => {
     fetchMatchDetails();
@@ -90,41 +93,49 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
 
       // Create Google Calendar event if user opted in
       if (addToCalendar) {
-        const startTime = new Date(scheduledAt).toISOString();
-        const endTime = new Date(
-          new Date(scheduledAt).getTime() + parseInt(duration) * 60000
-        ).toISOString();
-
-        const { data: calendarData, error: calendarError } = await supabase.functions.invoke(
-          'create-calendar-event',
-          {
-            body: {
-              summary: 'Mentorship Session',
-              description: notes || 'Scheduled mentorship session',
-              startTime,
-              endTime,
-              attendees: [mentorEmail, menteeEmail].filter(Boolean),
-            },
-          }
-        );
-
-        if (!calendarError && calendarData?.meetLink) {
-          // Update session with Google Meet link
-          await supabase
-            .from("mentorship_sessions")
-            .update({ meeting_link: calendarData.meetLink })
-            .eq("id", sessionData.id);
-
+        if (!isGoogleConnected || !googleAccessToken) {
           toast({
-            title: "Session Scheduled! 📅",
-            description: "Added to calendar with Google Meet link.",
+            title: "Google Calendar not connected",
+            description: "Connect Google to add a calendar invite with a Meet link.",
           });
         } else {
-          console.error('Calendar error:', calendarError);
-          toast({
-            title: "Session Scheduled! 📅",
-            description: "Your mentorship session has been scheduled.",
-          });
+          const startTime = new Date(scheduledAt).toISOString();
+          const endTime = new Date(
+            new Date(scheduledAt).getTime() + parseInt(duration) * 60000
+          ).toISOString();
+
+          const { data: calendarData, error: calendarError } = await supabase.functions.invoke(
+            'create-calendar-event',
+            {
+              body: {
+                summary: 'Mentorship Session',
+                description: notes || 'Scheduled mentorship session',
+                startTime,
+                endTime,
+                attendees: [mentorEmail, menteeEmail].filter(Boolean),
+                accessToken: googleAccessToken,
+              },
+            }
+          );
+
+          if (!calendarError && calendarData?.meetLink) {
+            // Update session with Google Meet link
+            await supabase
+              .from("mentorship_sessions")
+              .update({ meeting_link: calendarData.meetLink })
+              .eq("id", sessionData.id);
+
+            toast({
+              title: "Session Scheduled! 📅",
+              description: "Added to calendar with Google Meet link.",
+            });
+          } else {
+            console.error('Calendar error:', calendarError);
+            toast({
+              title: "Session Scheduled! 📅",
+              description: "Your mentorship session has been scheduled.",
+            });
+          }
         }
       } else {
         toast({
@@ -227,6 +238,25 @@ const SessionScheduler = ({ matchId, onClose }: SessionSchedulerProps) => {
             </p>
           </div>
         </div>
+
+        {addToCalendar && !isGoogleConnected && (
+          <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+            <div className="flex items-start gap-3">
+              <Video className="w-5 h-5 text-primary mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground mb-2">
+                  Connect Google Calendar
+                </p>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Link your Google account to add events and generate Meet links automatically.
+                </p>
+                <Button type="button" variant="outline" size="sm" onClick={connectGoogle}>
+                  Connect Google
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex gap-2 pt-4">
           <Button type="submit" disabled={loading} className="flex-1">

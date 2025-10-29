@@ -9,6 +9,7 @@ interface CalendarEventRequest {
   startTime: string
   endTime: string
   attendees: string[]
+  accessToken: string
   calendarId?: string
 }
 
@@ -18,16 +19,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { summary, description, startTime, endTime, attendees, calendarId = 'primary' } = await req.json() as CalendarEventRequest
-    
-    const googleApiKey = Deno.env.get('GOOGLE_API_KEY')
-    if (!googleApiKey) {
-      throw new Error('Google API key not configured')
+    const { summary, description, startTime, endTime, attendees, accessToken, calendarId = 'primary' } = await req.json() as CalendarEventRequest
+
+    if (!accessToken) {
+      return new Response(JSON.stringify({ error: 'Missing OAuth access token. Google Calendar requires OAuth, API keys are not supported for creating events.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
-    console.log('Creating calendar event:', { summary, startTime, endTime, attendees })
+    console.log('Creating calendar event with OAuth:', { summary, startTime, endTime, attendees })
 
-    // Create Google Calendar event using API key
     const event = {
       summary,
       description,
@@ -56,10 +58,11 @@ Deno.serve(async (req) => {
     }
 
     const response = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?conferenceDataVersion=1&key=${googleApiKey}`,
+      `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?conferenceDataVersion=1`,
       {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(event),
