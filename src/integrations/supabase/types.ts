@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      challenge_attempts: {
+        Row: {
+          challenge_type: Database["public"]["Enums"]["challenge_type"]
+          created_at: string
+          id: string
+          response_data: Json | null
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          challenge_type: Database["public"]["Enums"]["challenge_type"]
+          created_at?: string
+          id?: string
+          response_data?: Json | null
+          user_id: string
+          xp_earned: number
+        }
+        Update: {
+          challenge_type?: Database["public"]["Enums"]["challenge_type"]
+          created_at?: string
+          id?: string
+          response_data?: Json | null
+          user_id?: string
+          xp_earned?: number
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           content: string
@@ -462,6 +489,33 @@ export type Database = {
           },
         ]
       }
+      problem_scenarios: {
+        Row: {
+          correct_option_index: number
+          created_at: string
+          id: string
+          options: Json
+          problem_text: string
+          week_starting: string
+        }
+        Insert: {
+          correct_option_index: number
+          created_at?: string
+          id?: string
+          options: Json
+          problem_text: string
+          week_starting: string
+        }
+        Update: {
+          correct_option_index?: number
+          created_at?: string
+          id?: string
+          options?: Json
+          problem_text?: string
+          week_starting?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
@@ -530,6 +584,36 @@ export type Database = {
           },
         ]
       }
+      user_challenge_stats: {
+        Row: {
+          challenges_completed: number
+          created_at: string
+          id: string
+          level: Database["public"]["Enums"]["user_level"]
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenges_completed?: number
+          created_at?: string
+          id?: string
+          level?: Database["public"]["Enums"]["user_level"]
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenges_completed?: number
+          created_at?: string
+          id?: string
+          level?: Database["public"]["Enums"]["user_level"]
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_current_stage: {
         Row: {
           current_stage: Database["public"]["Enums"]["startup_stage"]
@@ -556,6 +640,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      challenge_type: "idea_generator" | "problem_solver" | "startup_simulation"
       expertise_area:
         | "product"
         | "marketing"
@@ -577,6 +662,7 @@ export type Database = {
         | "launch"
         | "growth"
         | "scaling"
+      user_level: "seed" | "growth" | "unicorn"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -704,6 +790,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      challenge_type: [
+        "idea_generator",
+        "problem_solver",
+        "startup_simulation",
+      ],
       expertise_area: [
         "product",
         "marketing",
@@ -727,6 +818,7 @@ export const Constants = {
         "growth",
         "scaling",
       ],
+      user_level: ["seed", "growth", "unicorn"],
     },
   },
 } as const
