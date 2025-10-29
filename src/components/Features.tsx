@@ -17,8 +17,8 @@ const Features = () => {
     },
     {
       icon: treeIcon,
-      title: t('features.decisions.title'),
-      description: t('features.decisions.description'),
+      title: t('features.challenges.title'),
+      description: t('features.challenges.description'),
       gradient: "from-secondary/10 to-secondary/20",
     },
     {

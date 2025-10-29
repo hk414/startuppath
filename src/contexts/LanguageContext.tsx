@@ -85,9 +85,9 @@ const translations = {
         title: "Interactive Timeline",
         description: "Log every pivot, decision, and milestone in your startup journey with a visual timeline that brings your story to life.",
       },
-      decisions: {
-        title: "Decision Trees",
-        description: "Visualize how each choice led to outcomes, creating a clear map of cause and effect throughout your startup evolution.",
+      challenges: {
+        title: "Startup Challenges & Games",
+        description: "Test your entrepreneurial skills with interactive games. Solve real startup problems, generate ideas, and compete on leaderboards while earning XP.",
       },
       mentor: {
         title: "AI Mentor Matching",
