@@ -3,22 +3,37 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Compass, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import logo from "@/assets/startuppath-logo.jpg";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [gdprConsent, setGdprConsent] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!gdprConsent) {
+      toast({
+        title: "GDPR Consent Required",
+        description: "Please accept the privacy policy and terms to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
@@ -44,6 +59,7 @@ const Auth = () => {
       setEmail("");
       setPassword("");
       setFullName("");
+      setGdprConsent(false);
     } catch (error: any) {
       toast({
         title: "Sign up failed",
@@ -89,20 +105,18 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-strong">
         <CardHeader className="space-y-2 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-12 h-12 rounded-lg bg-gradient-hero flex items-center justify-center shadow-soft">
-              <Compass className="w-7 h-7 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="StartUpPath Logo" className="w-12 h-12 rounded-lg shadow-soft" />
           </div>
-          <CardTitle className="text-3xl">Pivot Tracker</CardTitle>
+          <CardTitle className="text-3xl">StartUpPath</CardTitle>
           <CardDescription>
-            Document your startup journey and learn from every pivot
+            {t('auth.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin">
@@ -183,14 +197,40 @@ const Auth = () => {
                     minLength={6}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                
+                {/* GDPR Consent */}
+                <div className="flex items-start space-x-3 rounded-lg border border-border p-4 bg-muted/30">
+                  <Checkbox
+                    id="gdpr-consent"
+                    checked={gdprConsent}
+                    onCheckedChange={(checked) => setGdprConsent(checked as boolean)}
+                    disabled={isLoading}
+                  />
+                  <div className="space-y-1 leading-none">
+                    <Label
+                      htmlFor="gdpr-consent"
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      {t('auth.gdpr.accept')}{" "}
+                      <a href="#" className="text-primary hover:underline">
+                        {t('auth.gdpr.privacy')}
+                      </a>{" "}
+                      {t('auth.gdpr.and')}{" "}
+                      <a href="#" className="text-primary hover:underline">
+                        {t('auth.gdpr.terms')}
+                      </a>
+                    </Label>
+                  </div>
+                </div>
+                
+                <Button type="submit" className="w-full" disabled={isLoading || !gdprConsent}>
                   {isLoading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating account...
+                      {t('auth.creatingAccount')}
                     </>
                   ) : (
-                    "Create Account"
+                    t('auth.createAccount')
                   )}
                 </Button>
               </form>

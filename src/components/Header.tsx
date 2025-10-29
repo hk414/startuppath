@@ -4,6 +4,7 @@ import { ZoomIn, ZoomOut } from "lucide-react";
 import scrollToSection from "@/utils/scrollToSection";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/startuppath-logo.jpg";
 
 const Header = () => {
@@ -62,6 +63,7 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <div className="flex items-center gap-1 border border-border rounded-lg p-1">
               <Button
                 variant="ghost"

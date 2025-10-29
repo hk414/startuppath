@@ -154,6 +154,19 @@ const translations = {
         mentors: "Expert Mentors",
       }
     },
+    auth: {
+      description: "Unite mentorship, guidance & growth for student entrepreneurs",
+      signIn: "Sign In",
+      signUp: "Sign Up",
+      createAccount: "Create Account",
+      creatingAccount: "Creating account...",
+      gdpr: {
+        accept: "I accept the",
+        privacy: "Privacy Policy",
+        and: "and",
+        terms: "Terms of Service",
+      },
+    },
     challenges: {
       title: "Startup Challenges Arena",
       subtitle: "Play games, earn XP, and level up your entrepreneurial skills",
