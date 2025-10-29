@@ -3,14 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Check, X, Clock } from "lucide-react";
+import { Check, X, Clock, Video, Eye } from "lucide-react";
 
 interface MatchRequest {
   id: string;
   mentee_id: string;
   mentor_id: string;
   message: string;
+  video_url: string | null;
   status: string;
   created_at: string;
   mentee_profiles?: {
@@ -32,6 +34,7 @@ interface MatchRequestsProps {
 const MatchRequests = ({ profileId, isMentor }: MatchRequestsProps) => {
   const [requests, setRequests] = useState<MatchRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewingVideo, setViewingVideo] = useState<string | null>(null);
 
   useEffect(() => {
     fetchRequests();
@@ -117,29 +120,38 @@ const MatchRequests = ({ profileId, isMentor }: MatchRequestsProps) => {
   return (
     <div className="space-y-4">
       {requests.map((request) => (
-        <Card key={request.id} className="p-6">
+        <Card key={request.id} className="p-6 hover:shadow-glow transition-all">
           <div className="space-y-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 {isMentor ? (
                   <>
-                    <h3 className="font-semibold">
+                    <h3 className="font-heading font-bold text-lg">
                       {request.mentee_profiles?.startup_name || "Founder"}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {request.mentee_profiles?.industry} • {request.mentee_profiles?.startup_stage}
                     </p>
                   </>
                 ) : (
                   <>
-                    <h3 className="font-semibold">
+                    <h3 className="font-heading font-bold text-lg">
                       {request.mentor_profiles?.title || "Mentor"}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground mt-1">
                       {request.mentor_profiles?.company}
                     </p>
                   </>
                 )}
+                <p className="text-xs text-muted-foreground mt-2">
+                  {new Date(request.created_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
               </div>
               <Badge
                 variant={
@@ -149,13 +161,30 @@ const MatchRequests = ({ profileId, isMentor }: MatchRequestsProps) => {
                     ? "destructive"
                     : "secondary"
                 }
+                className="ml-4"
               >
                 {request.status}
               </Badge>
             </div>
 
             {request.message && (
-              <p className="text-sm text-muted-foreground">{request.message}</p>
+              <div className="bg-muted/30 p-4 rounded-xl">
+                <p className="text-sm text-foreground leading-relaxed">{request.message}</p>
+              </div>
+            )}
+
+            {request.video_url && (
+              <div className="bg-gradient-hero/10 p-4 rounded-xl border border-primary/20">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewingVideo(request.video_url)}
+                  className="gap-2"
+                >
+                  <Video className="w-4 h-4" />
+                  View Video Introduction
+                </Button>
+              </div>
             )}
 
             {isMentor && request.status === "pending" && (
@@ -163,16 +192,18 @@ const MatchRequests = ({ profileId, isMentor }: MatchRequestsProps) => {
                 <Button
                   onClick={() => handleRequest(request.id, "accepted")}
                   size="sm"
+                  className="gap-2"
                 >
-                  <Check className="w-4 h-4 mr-2" />
+                  <Check className="w-4 h-4" />
                   Accept
                 </Button>
                 <Button
                   onClick={() => handleRequest(request.id, "rejected")}
                   variant="outline"
                   size="sm"
+                  className="gap-2"
                 >
-                  <X className="w-4 h-4 mr-2" />
+                  <X className="w-4 h-4" />
                   Decline
                 </Button>
               </div>
@@ -180,6 +211,25 @@ const MatchRequests = ({ profileId, isMentor }: MatchRequestsProps) => {
           </div>
         </Card>
       ))}
+
+      {/* Video Viewer Dialog */}
+      <Dialog open={!!viewingVideo} onOpenChange={(open) => !open && setViewingVideo(null)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Video Introduction</DialogTitle>
+          </DialogHeader>
+          {viewingVideo && (
+            <div className="aspect-video rounded-xl overflow-hidden bg-muted">
+              <video
+                src={viewingVideo}
+                controls
+                autoPlay
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

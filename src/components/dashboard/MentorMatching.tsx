@@ -230,37 +230,61 @@ const MentorMatching = ({ userId }: MentorMatchingProps) => {
         </TabsContent>
 
         <TabsContent value="requests" className="mt-6">
-          {menteeProfileId && (
-            <MatchRequests profileId={menteeProfileId} isMentor={false} />
-          )}
-          {mentorProfileId && !menteeProfileId && (
-            <MatchRequests profileId={mentorProfileId} isMentor={true} />
-          )}
+          <div className="space-y-6">
+            {menteeProfileId && (
+              <div>
+                <h3 className="text-lg font-heading font-bold mb-4 text-foreground">
+                  Requests You've Sent
+                </h3>
+                <MatchRequests profileId={menteeProfileId} isMentor={false} />
+              </div>
+            )}
+            {mentorProfileId && (
+              <div className={menteeProfileId ? "mt-8" : ""}>
+                <h3 className="text-lg font-heading font-bold mb-4 text-foreground">
+                  Requests from Mentees
+                </h3>
+                <MatchRequests profileId={mentorProfileId} isMentor={true} />
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="matches" className="mt-6">
-          {menteeProfileId && (
-            <MatchesList
-              profileId={menteeProfileId}
-              isMentor={false}
-              onOpenChat={(matchId, otherUserId) => {
-                setActiveChatMatchId(matchId);
-                setActiveChatUserId(otherUserId);
-              }}
-              onScheduleSession={(matchId) => setActiveScheduleMatchId(matchId)}
-            />
-          )}
-          {mentorProfileId && !menteeProfileId && (
-            <MatchesList
-              profileId={mentorProfileId}
-              isMentor={true}
-              onOpenChat={(matchId, otherUserId) => {
-                setActiveChatMatchId(matchId);
-                setActiveChatUserId(otherUserId);
-              }}
-              onScheduleSession={(matchId) => setActiveScheduleMatchId(matchId)}
-            />
-          )}
+          <div className="space-y-6">
+            {menteeProfileId && (
+              <div>
+                <h3 className="text-lg font-heading font-bold mb-4 text-foreground">
+                  Your Mentors
+                </h3>
+                <MatchesList
+                  profileId={menteeProfileId}
+                  isMentor={false}
+                  onOpenChat={(matchId, otherUserId) => {
+                    setActiveChatMatchId(matchId);
+                    setActiveChatUserId(otherUserId);
+                  }}
+                  onScheduleSession={(matchId) => setActiveScheduleMatchId(matchId)}
+                />
+              </div>
+            )}
+            {mentorProfileId && (
+              <div className={menteeProfileId ? "mt-8" : ""}>
+                <h3 className="text-lg font-heading font-bold mb-4 text-foreground">
+                  Your Mentees
+                </h3>
+                <MatchesList
+                  profileId={mentorProfileId}
+                  isMentor={true}
+                  onOpenChat={(matchId, otherUserId) => {
+                    setActiveChatMatchId(matchId);
+                    setActiveChatUserId(otherUserId);
+                  }}
+                  onScheduleSession={(matchId) => setActiveScheduleMatchId(matchId)}
+                />
+              </div>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
 

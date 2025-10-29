@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { VideoRecorder } from "@/components/matching/VideoRecorder";
 import { toast } from "@/hooks/use-toast";
-import { Search, Send } from "lucide-react";
+import { Search, Send, Video, MessageSquare } from "lucide-react";
 
 interface MentorProfile {
   id: string;
@@ -34,6 +35,8 @@ const MentorBrowser = ({ menteeProfileId }: MentorBrowserProps) => {
   const [loading, setLoading] = useState(true);
   const [requestMessage, setRequestMessage] = useState("");
   const [selectedMentor, setSelectedMentor] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [showVideoRecorder, setShowVideoRecorder] = useState(false);
 
   useEffect(() => {
     fetchMentors();
@@ -84,6 +87,7 @@ const MentorBrowser = ({ menteeProfileId }: MentorBrowserProps) => {
         mentee_id: menteeProfileId,
         mentor_id: mentorId,
         message: requestMessage,
+        video_url: videoUrl,
         status: "pending",
       });
 
@@ -95,6 +99,8 @@ const MentorBrowser = ({ menteeProfileId }: MentorBrowserProps) => {
       });
 
       setRequestMessage("");
+      setVideoUrl(null);
+      setShowVideoRecorder(false);
       setSelectedMentor(null);
     } catch (error: any) {
       toast({
@@ -103,6 +109,11 @@ const MentorBrowser = ({ menteeProfileId }: MentorBrowserProps) => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleVideoUploaded = (url: string) => {
+    setVideoUrl(url);
+    setShowVideoRecorder(false);
   };
 
   if (loading) {
@@ -165,7 +176,7 @@ const MentorBrowser = ({ menteeProfileId }: MentorBrowserProps) => {
                       Request Match
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Send Match Request</DialogTitle>
                     </DialogHeader>
@@ -173,17 +184,66 @@ const MentorBrowser = ({ menteeProfileId }: MentorBrowserProps) => {
                       <p className="text-sm text-muted-foreground">
                         Send a message to {mentor.title} explaining why you'd like them as a mentor.
                       </p>
-                      <Textarea
-                        placeholder="Tell them about your goals and why you think they'd be a great mentor..."
-                        value={requestMessage}
-                        onChange={(e) => setRequestMessage(e.target.value)}
-                        rows={5}
-                      />
+
+                      {/* Tab selector for message or video */}
+                      <div className="flex gap-2 p-1 bg-muted rounded-lg">
+                        <Button
+                          variant={!showVideoRecorder ? "secondary" : "ghost"}
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setShowVideoRecorder(false)}
+                        >
+                          <MessageSquare className="w-4 h-4 mr-2" />
+                          Message
+                        </Button>
+                        <Button
+                          variant={showVideoRecorder ? "secondary" : "ghost"}
+                          size="sm"
+                          className="flex-1"
+                          onClick={() => setShowVideoRecorder(true)}
+                        >
+                          <Video className="w-4 h-4 mr-2" />
+                          Video Intro
+                        </Button>
+                      </div>
+
+                      {!showVideoRecorder ? (
+                        <Textarea
+                          placeholder="Tell them about your goals and why you think they'd be a great mentor..."
+                          value={requestMessage}
+                          onChange={(e) => setRequestMessage(e.target.value)}
+                          rows={5}
+                        />
+                      ) : (
+                        <VideoRecorder onVideoUploaded={handleVideoUploaded} maxDuration={60} />
+                      )}
+
+                      {videoUrl && !showVideoRecorder && (
+                        <div className="p-4 bg-accent-light rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Video className="w-4 h-4 text-accent" />
+                              <span className="text-sm font-medium text-foreground">
+                                Video introduction attached
+                              </span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setVideoUrl(null)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
                       <Button
                         onClick={() => sendMatchRequest(mentor.id)}
-                        disabled={!requestMessage.trim()}
+                        disabled={!requestMessage.trim() && !videoUrl}
                         className="w-full"
                       >
+                        <Send className="w-4 h-4 mr-2" />
                         Send Request
                       </Button>
                     </div>

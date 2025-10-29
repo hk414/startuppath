@@ -173,6 +173,7 @@ export type Database = {
           message: string | null
           status: Database["public"]["Enums"]["match_status"]
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           created_at?: string
@@ -182,6 +183,7 @@ export type Database = {
           message?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           created_at?: string
@@ -191,6 +193,7 @@ export type Database = {
           message?: string | null
           status?: Database["public"]["Enums"]["match_status"]
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -267,6 +270,7 @@ export type Database = {
           goals: string[]
           id: string
           industry: string
+          intro_video_url: string | null
           preferred_mentor_traits: string[]
           startup_name: string | null
           startup_stage: Database["public"]["Enums"]["startup_stage"]
@@ -280,6 +284,7 @@ export type Database = {
           goals?: string[]
           id?: string
           industry: string
+          intro_video_url?: string | null
           preferred_mentor_traits?: string[]
           startup_name?: string | null
           startup_stage: Database["public"]["Enums"]["startup_stage"]
@@ -293,6 +298,7 @@ export type Database = {
           goals?: string[]
           id?: string
           industry?: string
+          intro_video_url?: string | null
           preferred_mentor_traits?: string[]
           startup_name?: string | null
           startup_stage?: Database["public"]["Enums"]["startup_stage"]
@@ -311,6 +317,7 @@ export type Database = {
           expertise_areas: Database["public"]["Enums"]["expertise_area"][]
           id: string
           industries: string[]
+          intro_video_url: string | null
           is_active: boolean | null
           linkedin_url: string | null
           max_mentees: number | null
@@ -329,6 +336,7 @@ export type Database = {
           expertise_areas?: Database["public"]["Enums"]["expertise_area"][]
           id?: string
           industries?: string[]
+          intro_video_url?: string | null
           is_active?: boolean | null
           linkedin_url?: string | null
           max_mentees?: number | null
@@ -347,6 +355,7 @@ export type Database = {
           expertise_areas?: Database["public"]["Enums"]["expertise_area"][]
           id?: string
           industries?: string[]
+          intro_video_url?: string | null
           is_active?: boolean | null
           linkedin_url?: string | null
           max_mentees?: number | null
