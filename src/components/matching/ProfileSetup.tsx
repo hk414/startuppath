@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { X } from "lucide-react";
+import { X, Crown, Lock, CheckCircle2, CreditCard } from "lucide-react";
 
 interface ProfileSetupProps {
   userId: string;
@@ -17,6 +18,14 @@ interface ProfileSetupProps {
 
 const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
   const [profileType, setProfileType] = useState<"mentor" | "mentee" | null>(null);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumStep, setPremiumStep] = useState<'info' | 'payment' | 'success'>('info');
+  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [cardName, setCardName] = useState("");
+  
   
   // Mentor fields
   const [title, setTitle] = useState("");
@@ -118,54 +127,259 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
     }
   };
 
+  const handlePayment = () => {
+    setTimeout(() => {
+      setPremiumStep('success');
+      setTimeout(() => {
+        setIsPremiumUser(true);
+        setShowPremiumModal(false);
+        setPremiumStep('info');
+        setCardNumber("");
+        setExpiryDate("");
+        setCvv("");
+        setCardName("");
+        toast({
+          title: "Welcome to Premium! 🎉",
+          description: "You now have access to mentor matching.",
+        });
+      }, 2000);
+    }, 1500);
+  };
+
+  const handleMenteeSelection = () => {
+    if (!isPremiumUser) {
+      setShowPremiumModal(true);
+      return;
+    }
+    setProfileType("mentee");
+  };
+
   if (!profileType) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <Card className="max-w-2xl w-full p-8">
-          <h2 className="text-2xl font-bold text-foreground mb-4 text-center">
-            Welcome to Mentor Matching!
-          </h2>
-          <p className="text-muted-foreground mb-8 text-center">
-            Are you looking for mentorship or offering it?
-          </p>
-          
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card 
-              className="p-6 cursor-pointer hover:shadow-strong transition-all hover:scale-[1.02]"
-              onClick={() => setProfileType("mentee")}
-            >
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-3xl">🚀</span>
+      <>
+        {/* Premium Modal */}
+        <Dialog open={showPremiumModal} onOpenChange={(open) => {
+          setShowPremiumModal(open);
+          if (!open) {
+            setPremiumStep('info');
+            setCardNumber("");
+            setExpiryDate("");
+            setCvv("");
+            setCardName("");
+          }
+        }}>
+          <DialogContent className="sm:max-w-md">
+            {premiumStep === 'info' && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                      <Crown className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                  <DialogTitle className="text-center text-2xl">Upgrade to Premium</DialogTitle>
+                  <DialogDescription className="text-center space-y-4 pt-4">
+                    <p className="text-base">
+                      Unlock mentor matching and grow your startup with expert guidance.
+                    </p>
+                    <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                      <p className="font-semibold text-foreground">Premium includes:</p>
+                      <ul className="text-sm space-y-1 text-muted-foreground">
+                        <li>🎓 Connect with experienced mentors</li>
+                        <li>💬 Unlimited messaging with matches</li>
+                        <li>📅 Schedule mentorship sessions</li>
+                        <li>✨ AI-powered pivot insights</li>
+                        <li>📊 Professional investor reports</li>
+                      </ul>
+                    </div>
+                    <div className="pt-2">
+                      <p className="text-2xl font-bold text-foreground">$29/month</p>
+                      <p className="text-sm text-muted-foreground">Cancel anytime</p>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex gap-3 mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPremiumModal(false)}
+                    className="flex-1"
+                  >
+                    Maybe Later
+                  </Button>
+                  <Button
+                    onClick={() => setPremiumStep('payment')}
+                    className="flex-1"
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Continue
+                  </Button>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-foreground">I'm a Founder</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Seeking guidance from experienced mentors
-                  </p>
-                </div>
-              </div>
-            </Card>
+              </>
+            )}
 
-            <Card 
-              className="p-6 cursor-pointer hover:shadow-strong transition-all hover:scale-[1.02]"
-              onClick={() => setProfileType("mentor")}
-            >
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
-                  <span className="text-3xl">🎓</span>
+            {premiumStep === 'payment' && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-center text-2xl">Payment Details</DialogTitle>
+                  <DialogDescription className="text-center">
+                    Enter your payment information to complete upgrade
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="card-name">Cardholder Name</Label>
+                    <Input
+                      id="card-name"
+                      placeholder="John Doe"
+                      value={cardName}
+                      onChange={(e) => setCardName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="card-number">Card Number</Label>
+                    <div className="relative">
+                      <Input
+                        id="card-number"
+                        placeholder="1234 5678 9012 3456"
+                        value={cardNumber}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\s/g, '');
+                          const formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+                          setCardNumber(formatted);
+                        }}
+                        maxLength={19}
+                      />
+                      <CreditCard className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="expiry">Expiry Date</Label>
+                      <Input
+                        id="expiry"
+                        placeholder="MM/YY"
+                        value={expiryDate}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '');
+                          if (value.length >= 2) {
+                            setExpiryDate(value.slice(0, 2) + '/' + value.slice(2, 4));
+                          } else {
+                            setExpiryDate(value);
+                          }
+                        }}
+                        maxLength={5}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="cvv">CVV</Label>
+                      <Input
+                        id="cvv"
+                        placeholder="123"
+                        type="password"
+                        value={cvv}
+                        onChange={(e) => setCvv(e.target.value.replace(/\D/g, ''))}
+                        maxLength={3}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-lg text-foreground">I'm a Mentor</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Sharing my experience with startup founders
-                  </p>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setPremiumStep('info')}
+                    className="flex-1"
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    onClick={handlePayment}
+                    disabled={!cardName || cardNumber.length < 19 || expiryDate.length < 5 || cvv.length < 3}
+                    className="flex-1"
+                  >
+                    <Lock className="w-4 h-4 mr-2" />
+                    Pay $29
+                  </Button>
                 </div>
-              </div>
-            </Card>
-          </div>
-        </Card>
-      </div>
+              </>
+            )}
+
+            {premiumStep === 'success' && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center animate-in zoom-in duration-300">
+                      <CheckCircle2 className="w-10 h-10 text-green-500" />
+                    </div>
+                  </div>
+                  <DialogTitle className="text-center text-2xl">Payment Successful!</DialogTitle>
+                  <DialogDescription className="text-center space-y-4 pt-4">
+                    <p className="text-base text-foreground">
+                      Welcome to Premium! 🎉
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      You now have full access to mentor matching and all premium features.
+                    </p>
+                  </DialogDescription>
+                </DialogHeader>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <Card className="max-w-2xl w-full p-8">
+            <h2 className="text-2xl font-bold text-foreground mb-4 text-center">
+              Welcome to Mentor Matching!
+            </h2>
+            <p className="text-muted-foreground mb-8 text-center">
+              Are you looking for mentorship or offering it?
+            </p>
+            
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Card 
+                className="p-6 cursor-pointer hover:shadow-strong transition-all hover:scale-[1.02] relative"
+                onClick={handleMenteeSelection}
+              >
+                <div className="flex flex-col items-center gap-4 text-center">
+                  {!isPremiumUser && (
+                    <Badge variant="secondary" className="absolute top-3 right-3 text-xs">
+                      <Crown className="w-3 h-3 mr-1" />
+                      Premium
+                    </Badge>
+                  )}
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-3xl">🚀</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-foreground">I'm a Founder</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Seeking guidance from experienced mentors
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card 
+                className="p-6 cursor-pointer hover:shadow-strong transition-all hover:scale-[1.02]"
+                onClick={() => setProfileType("mentor")}
+              >
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
+                    <span className="text-3xl">🎓</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg text-foreground">I'm a Mentor</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Sharing my experience with startup founders
+                    </p>
+                    <Badge variant="outline" className="mt-2">Free to join</Badge>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </Card>
+        </div>
+      </>
     );
   }
 
