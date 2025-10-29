@@ -97,27 +97,6 @@ const DashboardHome = ({ onNavigate }: DashboardHomeProps) => {
           </Card>
         ))}
       </div>
-
-      {/* Quick Stats */}
-      <Card className="p-8 bg-gradient-subtle">
-        <h3 className="text-xl font-bold text-foreground mb-6 text-center">
-          Your Progress at a Glance
-        </h3>
-        <div className="grid grid-cols-3 gap-8 text-center">
-          <div>
-            <div className="text-3xl font-bold text-primary mb-1">0</div>
-            <div className="text-sm text-muted-foreground">Chapters Completed</div>
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-accent mb-1">0</div>
-            <div className="text-sm text-muted-foreground">Pivots Documented</div>
-          </div>
-          <div>
-            <div className="text-3xl font-bold text-secondary mb-1">0</div>
-            <div className="text-sm text-muted-foreground">Mentor Sessions</div>
-          </div>
-        </div>
-      </Card>
     </div>
   );
 };
