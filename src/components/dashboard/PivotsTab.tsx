@@ -192,55 +192,6 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
         </TabsContent>
 
         <TabsContent value="pivots" className="mt-6">
-          {/* AI Insights Section */}
-          {pivots.length > 0 && (
-            <Card className="p-6 mb-6 bg-gradient-hero/5 border-primary/20">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground">AI Insights</h3>
-                    <p className="text-sm text-muted-foreground">Patterns and learnings from your pivot journey</p>
-                  </div>
-                </div>
-                <Button 
-                  onClick={generateAIInsights}
-                  disabled={isAnalyzing}
-                  size="sm"
-                  className="gap-2"
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      Generate Insights
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {aiInsights ? (
-                <div className="space-y-4 mt-4">
-                  <div className="prose prose-sm max-w-none">
-                    <div className="bg-background/50 rounded-lg p-4 whitespace-pre-wrap text-foreground">
-                      {aiInsights}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>Click "Generate Insights" to get AI-powered analysis of your pivots</p>
-                </div>
-              )}
-            </Card>
-          )}
-
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-2xl font-bold text-foreground">Documented Pivots</h3>
@@ -405,8 +356,57 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
               </div>
             </Card>
           ))}
-        </div>
-      )}
+         </div>
+       )}
+
+       {/* AI Insights Section - After Pivots */}
+       {pivots.length > 0 && (
+         <Card className="p-6 mt-6 bg-gradient-hero/5 border-primary/20">
+           <div className="flex items-start justify-between mb-4">
+             <div className="flex items-center gap-3">
+               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                 <Sparkles className="w-5 h-5 text-primary" />
+               </div>
+               <div>
+                 <h3 className="text-lg font-semibold text-foreground">AI Insights</h3>
+                 <p className="text-sm text-muted-foreground">Patterns and learnings from your pivot journey</p>
+               </div>
+             </div>
+             <Button 
+               onClick={generateAIInsights}
+               disabled={isAnalyzing}
+               size="sm"
+               className="gap-2"
+             >
+               {isAnalyzing ? (
+                 <>
+                   <Loader2 className="w-4 h-4 animate-spin" />
+                   Analyzing...
+                 </>
+               ) : (
+                 <>
+                   <Sparkles className="w-4 h-4" />
+                   Generate Insights
+                 </>
+               )}
+             </Button>
+           </div>
+
+           {aiInsights ? (
+             <div className="space-y-4 mt-4">
+               <div className="prose prose-sm max-w-none">
+                 <div className="bg-background/50 rounded-lg p-4 whitespace-pre-wrap text-foreground">
+                   {aiInsights}
+                 </div>
+               </div>
+             </div>
+           ) : (
+             <div className="text-center py-8 text-muted-foreground">
+               <p>Click "Generate Insights" to get AI-powered analysis of your pivots</p>
+             </div>
+           )}
+         </Card>
+       )}
         </TabsContent>
       </Tabs>
     </div>
