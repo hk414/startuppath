@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Compass, Menu, ZoomIn, ZoomOut } from "lucide-react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import scrollToSection from "@/utils/scrollToSection";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
+import logo from "@/assets/startuppath-logo.jpg";
 
 const Header = () => {
   const { t } = useLanguage();
@@ -27,10 +28,8 @@ const Header = () => {
         <nav className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-hero flex items-center justify-center shadow-soft">
-              <Compass className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Pivot Tracker</span>
+            <img src={logo} alt="StartUpPath Logo" className="w-10 h-10 rounded-lg shadow-soft" />
+            <span className="text-xl font-bold text-foreground">StartUpPath</span>
           </div>
 
           {/* Desktop Nav */}
@@ -99,9 +98,6 @@ const Header = () => {
               onClick={() => window.location.href = '/dashboard'}
             >
               {t('nav.dashboard')}
-            </Button>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="w-5 h-5" />
             </Button>
           </div>
         </nav>

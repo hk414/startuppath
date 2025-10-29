@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
-import { Home, BookOpen, Lightbulb, GitBranch, Users, LogOut, Menu, Gamepad2 } from "lucide-react";
+import { Home, BookOpen, Lightbulb, GitBranch, Users, LogOut, Menu, Gamepad2, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import logo from "@/assets/startuppath-logo.jpg";
 import DashboardHome from "./DashboardHome";
 import JournalTab from "./JournalTab";
 import PivotsTab from "./PivotsTab";
@@ -20,8 +21,21 @@ type Tab = "home" | "guidebook" | "journal" | "pivots" | "lessons" | "matching" 
 const DashboardLayout = ({ user }: DashboardLayoutProps) => {
   const [activeTab, setActiveTab] = useState<Tab>("home");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [fontSize, setFontSize] = useState(100);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const increaseFontSize = () => {
+    const newSize = Math.min(fontSize + 10, 150);
+    setFontSize(newSize);
+    document.documentElement.style.fontSize = `${newSize}%`;
+  };
+
+  const decreaseFontSize = () => {
+    const newSize = Math.max(fontSize - 10, 80);
+    setFontSize(newSize);
+    document.documentElement.style.fontSize = `${newSize}%`;
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -50,13 +64,19 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
         } bg-card border-r border-border transition-all duration-300 flex flex-col`}
       >
         <div className="p-4 border-b border-border flex items-center justify-between">
-          {sidebarOpen && (
-            <h1 className="text-xl font-bold text-foreground">Pivot Tracker</h1>
+          {sidebarOpen ? (
+            <div className="flex items-center gap-2">
+              <img src={logo} alt="StartUpPath Logo" className="w-8 h-8 rounded-lg shadow-soft" />
+              <h1 className="text-xl font-bold text-foreground">StartUpPath</h1>
+            </div>
+          ) : (
+            <img src={logo} alt="StartUpPath Logo" className="w-8 h-8 rounded-lg shadow-soft mx-auto" />
           )}
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={!sidebarOpen ? "mx-auto mt-2" : ""}
           >
             <Menu className="w-5 h-5" />
           </Button>
@@ -80,6 +100,28 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
         </nav>
 
         <div className="p-4 border-t border-border space-y-2">
+          {/* Font Size Controls */}
+          <div className={`flex items-center gap-1 border border-border rounded-lg p-1 ${!sidebarOpen ? 'flex-col' : ''}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={decreaseFontSize}
+              aria-label="Decrease font size"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={increaseFontSize}
+              aria-label="Increase font size"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </Button>
+          </div>
+          
           {sidebarOpen && (
             <div className="px-4 py-2 text-sm text-muted-foreground">
               <p className="font-medium truncate">{user.email}</p>
