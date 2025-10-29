@@ -729,6 +729,55 @@ const Guidebook = () => {
           })}
         </div>
 
+        {/* Stage Navigation Buttons */}
+        <div className="mt-8 flex gap-4">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              const currentIndex = stages.findIndex(s => s.id === selectedStage);
+              if (currentIndex > 0) {
+                setSelectedStage(stages[currentIndex - 1].id);
+                setExpandedSection(null);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            disabled={stages.findIndex(s => s.id === selectedStage) === 0}
+            className="flex-1"
+          >
+            <ChevronLeft className="w-5 h-5 mr-2" />
+            Previous Stage
+          </Button>
+
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => setSelectedStage(null)}
+            className="flex-1"
+          >
+            <Home className="w-5 h-5 mr-2" />
+            All Stages
+          </Button>
+
+          <Button
+            variant="default"
+            size="lg"
+            onClick={() => {
+              const currentIndex = stages.findIndex(s => s.id === selectedStage);
+              if (currentIndex < stages.length - 1) {
+                setSelectedStage(stages[currentIndex + 1].id);
+                setExpandedSection(null);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            disabled={stages.findIndex(s => s.id === selectedStage) === stages.length - 1}
+            className="flex-1"
+          >
+            Next Stage
+            <ChevronRight className="w-5 h-5 ml-2" />
+          </Button>
+        </div>
+
         {/* Completion Message */}
         {completionRate === 100 && (
           <Card className="mt-8 p-8 text-center bg-gradient-hero text-primary-foreground">
@@ -741,9 +790,20 @@ const Guidebook = () => {
             <Button
               variant="secondary"
               size="lg"
-              onClick={() => setSelectedStage(null)}
+              onClick={() => {
+                const currentIndex = stages.findIndex(s => s.id === selectedStage);
+                if (currentIndex < stages.length - 1) {
+                  setSelectedStage(stages[currentIndex + 1].id);
+                  setExpandedSection(null);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  setSelectedStage(null);
+                }
+              }}
             >
-              Choose Next Stage
+              {stages.findIndex(s => s.id === selectedStage) === stages.length - 1 
+                ? "Back to All Stages" 
+                : "Go to Next Stage"}
             </Button>
           </Card>
         )}
