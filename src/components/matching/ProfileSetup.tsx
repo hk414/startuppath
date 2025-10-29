@@ -20,7 +20,10 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
   const [profileType, setProfileType] = useState<"mentor" | "mentee" | null>(null);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumStep, setPremiumStep] = useState<'info' | 'payment' | 'success'>('info');
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(() => {
+    // Load premium status from localStorage
+    return localStorage.getItem('isPremiumUser') === 'true';
+  });
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
@@ -132,6 +135,8 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
       setPremiumStep('success');
       setTimeout(() => {
         setIsPremiumUser(true);
+        // Persist premium status to localStorage
+        localStorage.setItem('isPremiumUser', 'true');
         setShowPremiumModal(false);
         setPremiumStep('info');
         setCardNumber("");
@@ -140,8 +145,10 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
         setCardName("");
         toast({
           title: "Welcome to Premium! 🎉",
-          description: "You now have access to mentor matching.",
+          description: "You now have permanent access to mentor matching and all premium features.",
         });
+        // Auto-select mentee profile after successful payment
+        setProfileType("mentee");
       }, 2000);
     }, 1500);
   };
@@ -193,8 +200,8 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
                       </ul>
                     </div>
                     <div className="pt-2">
-                      <p className="text-2xl font-bold text-foreground">$29/month</p>
-                      <p className="text-sm text-muted-foreground">Cancel anytime</p>
+                      <p className="text-2xl font-bold text-foreground">£10</p>
+                      <p className="text-sm text-muted-foreground">One-time payment • Lifetime access</p>
                     </div>
                   </DialogDescription>
                 </DialogHeader>
@@ -297,7 +304,7 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
                     className="flex-1"
                   >
                     <Lock className="w-4 h-4 mr-2" />
-                    Pay $29
+                    Pay £10
                   </Button>
                 </div>
               </>
@@ -317,7 +324,7 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
                       Welcome to Premium! 🎉
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      You now have full access to mentor matching and all premium features.
+                      You now have permanent access to mentor matching and all premium features.
                     </p>
                   </DialogDescription>
                 </DialogHeader>

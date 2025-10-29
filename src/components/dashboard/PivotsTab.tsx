@@ -54,7 +54,10 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   const [currentStage, setCurrentStage] = useState("");
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const [premiumStep, setPremiumStep] = useState<'info' | 'payment' | 'success'>('info');
-  const [isPremiumUser, setIsPremiumUser] = useState(false);
+  const [isPremiumUser, setIsPremiumUser] = useState(() => {
+    // Load premium status from localStorage
+    return localStorage.getItem('isPremiumUser') === 'true';
+  });
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
@@ -373,6 +376,8 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
       setPremiumStep('success');
       setTimeout(() => {
         setIsPremiumUser(true);
+        // Persist premium status to localStorage
+        localStorage.setItem('isPremiumUser', 'true');
         setShowPremiumModal(false);
         setPremiumStep('info');
         // Reset form
@@ -382,7 +387,7 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
         setCardName("");
         toast({
           title: "Welcome to Premium! 🎉",
-          description: "You now have access to all premium features.",
+          description: "You now have permanent access to all premium features.",
         });
       }, 2000);
     }, 1500);
@@ -430,15 +435,15 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                       <li>📄 Export to PDF, PPTX & Markdown</li>
                       <li>🎯 Personalized recommendations</li>
                     </ul>
-                  </div>
-                  <div className="pt-2">
-                    <p className="text-2xl font-bold text-foreground">$29/month</p>
-                    <p className="text-sm text-muted-foreground">Cancel anytime</p>
-                  </div>
-                </DialogDescription>
-              </DialogHeader>
-              <div className="flex gap-3 mt-4">
-                <Button
+                    </div>
+                    <div className="pt-2">
+                      <p className="text-2xl font-bold text-foreground">£10</p>
+                      <p className="text-sm text-muted-foreground">One-time payment • Lifetime access</p>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex gap-3 mt-4">
+                  <Button
                   variant="outline"
                   onClick={() => setShowPremiumModal(false)}
                   className="flex-1"
@@ -535,9 +540,9 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                   disabled={!cardName || cardNumber.length < 19 || expiryDate.length < 5 || cvv.length < 3}
                   className="flex-1"
                 >
-                  <Lock className="w-4 h-4 mr-2" />
-                  Pay $29
-                </Button>
+                    <Lock className="w-4 h-4 mr-2" />
+                    Pay £10
+                  </Button>
               </div>
             </>
           )}
@@ -555,9 +560,9 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                   <p className="text-base text-foreground">
                     Welcome to Premium! 🎉
                   </p>
-                  <p className="text-sm text-muted-foreground">
-                    You now have access to all premium features including AI Insights and Investor Reports.
-                  </p>
+                    <p className="text-sm text-muted-foreground">
+                      You now have permanent access to all premium features including AI Insights and Investor Reports.
+                    </p>
                 </DialogDescription>
               </DialogHeader>
             </>
