@@ -1,11 +1,25 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Compass, Menu } from "lucide-react";
+import { Compass, Menu, ZoomIn, ZoomOut } from "lucide-react";
 import scrollToSection from "@/utils/scrollToSection";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Header = () => {
   const { t } = useLanguage();
+  const [fontSize, setFontSize] = useState(100);
+
+  const increaseFontSize = () => {
+    const newSize = Math.min(fontSize + 10, 150);
+    setFontSize(newSize);
+    document.documentElement.style.fontSize = `${newSize}%`;
+  };
+
+  const decreaseFontSize = () => {
+    const newSize = Math.max(fontSize - 10, 80);
+    setFontSize(newSize);
+    document.documentElement.style.fontSize = `${newSize}%`;
+  };
   
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
@@ -49,8 +63,28 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 border border-border rounded-lg p-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={decreaseFontSize}
+                aria-label="Decrease font size"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={increaseFontSize}
+                aria-label="Increase font size"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </Button>
+            </div>
             <LanguageSelector />
-            <Button 
+            <Button
               variant="ghost" 
               size="sm" 
               className="hidden md:inline-flex"

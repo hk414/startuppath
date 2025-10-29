@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import DashboardHome from "./DashboardHome";
 import JournalTab from "./JournalTab";
 import PivotsTab from "./PivotsTab";
-import LessonsTab from "./LessonsTab";
 import MentorMatching from "./MentorMatching";
 import Guidebook from "@/pages/Guidebook";
 
