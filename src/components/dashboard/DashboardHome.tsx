@@ -1,9 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, GitBranch, Users, ArrowRight } from "lucide-react";
+import { BookOpen, GitBranch, Users, ArrowRight, Gamepad2 } from "lucide-react";
 
 interface DashboardHomeProps {
-  onNavigate: (section: "home" | "guidebook" | "journal" | "pivots" | "lessons" | "matching") => void;
+  onNavigate: (section: "home" | "guidebook" | "journal" | "pivots" | "lessons" | "matching" | "challenges") => void;
 }
 
 const sections = [
@@ -31,6 +31,14 @@ const sections = [
     color: "bg-secondary",
     features: ["AI-powered matching", "1-on-1 sessions", "Community insights"],
   },
+  {
+    id: "challenges" as const,
+    title: "Startup Challenges",
+    description: "Test your entrepreneurial skills with interactive games. Earn XP, compete on leaderboards, and learn by doing.",
+    icon: Gamepad2,
+    color: "bg-gradient-to-br from-purple-600 to-pink-600",
+    features: ["Interactive games", "XP & leaderboards", "Skill development"],
+  },
 ];
 
 const DashboardHome = ({ onNavigate }: DashboardHomeProps) => {
@@ -47,7 +55,7 @@ const DashboardHome = ({ onNavigate }: DashboardHomeProps) => {
       </div>
 
       {/* Main Sections */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {sections.map((section) => (
           <Card
             key={section.id}

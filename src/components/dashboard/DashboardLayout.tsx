@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
-import { Home, BookOpen, Lightbulb, GitBranch, Users, LogOut, Menu } from "lucide-react";
+import { Home, BookOpen, Lightbulb, GitBranch, Users, LogOut, Menu, Gamepad2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -16,7 +16,7 @@ interface DashboardLayoutProps {
   user: User;
 }
 
-type Tab = "home" | "guidebook" | "journal" | "pivots" | "lessons" | "matching";
+type Tab = "home" | "guidebook" | "journal" | "pivots" | "lessons" | "matching" | "challenges";
 
 const DashboardLayout = ({ user }: DashboardLayoutProps) => {
   const [activeTab, setActiveTab] = useState<Tab>("home");
@@ -38,8 +38,8 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
     { id: "guidebook" as Tab, label: "Guidebook", icon: BookOpen },
     { id: "journal" as Tab, label: "Journal", icon: GitBranch },
     { id: "pivots" as Tab, label: "Pivots", icon: Lightbulb },
-    { id: "lessons" as Tab, label: "Lessons", icon: Lightbulb },
     { id: "matching" as Tab, label: "Mentors", icon: Users },
+    { id: "challenges" as Tab, label: "Challenges", icon: Gamepad2 },
   ];
 
   return (
@@ -104,8 +104,26 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
           {activeTab === "guidebook" && <Guidebook />}
           {activeTab === "journal" && <JournalTab userId={user.id} />}
           {activeTab === "pivots" && <PivotsTab userId={user.id} />}
-          {activeTab === "lessons" && <LessonsTab userId={user.id} />}
           {activeTab === "matching" && <MentorMatching userId={user.id} />}
+          {activeTab === "challenges" && (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-black bg-gradient-hero bg-clip-text text-transparent">
+                    Startup Challenges Arena
+                  </h2>
+                  <p className="text-muted-foreground mt-1">
+                    Play games, earn XP, and level up your entrepreneurial skills
+                  </p>
+                </div>
+              </div>
+              <iframe 
+                src="/challenges" 
+                className="w-full h-[calc(100vh-12rem)] border border-border rounded-2xl shadow-strong"
+                title="Challenges"
+              />
+            </div>
+          )}
         </div>
       </main>
     </div>
