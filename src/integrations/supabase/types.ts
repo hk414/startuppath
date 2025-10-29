@@ -55,6 +55,39 @@ export type Database = {
           },
         ]
       }
+      journey_timeline: {
+        Row: {
+          achieved_at: string
+          created_at: string
+          id: string
+          notes: string | null
+          stage: Database["public"]["Enums"]["startup_stage"]
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          stage: Database["public"]["Enums"]["startup_stage"]
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          stage?: Database["public"]["Enums"]["startup_stage"]
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lessons: {
         Row: {
           category: string
@@ -179,6 +212,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_current_stage: {
+        Row: {
+          current_stage: Database["public"]["Enums"]["startup_stage"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_stage: Database["public"]["Enums"]["startup_stage"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_stage?: Database["public"]["Enums"]["startup_stage"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -187,7 +238,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      startup_stage:
+        | "idea"
+        | "validation"
+        | "building"
+        | "testing"
+        | "launch"
+        | "growth"
+        | "scaling"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -314,6 +372,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      startup_stage: [
+        "idea",
+        "validation",
+        "building",
+        "testing",
+        "launch",
+        "growth",
+        "scaling",
+      ],
+    },
   },
 } as const

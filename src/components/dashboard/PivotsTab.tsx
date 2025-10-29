@@ -6,9 +6,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import JourneyTimeline from "./JourneyTimeline";
 
 interface Pivot {
   id: string;
@@ -138,11 +140,27 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-foreground">Pivots & Decisions</h2>
-          <p className="text-muted-foreground mt-1">Track major changes in your startup journey</p>
-        </div>
+      <div>
+        <h2 className="text-3xl font-bold text-foreground">Pivot Tracker</h2>
+        <p className="text-muted-foreground mt-1">Track your journey and document major decisions</p>
+      </div>
+
+      <Tabs defaultValue="timeline" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="timeline">Journey Timeline</TabsTrigger>
+          <TabsTrigger value="pivots">Pivots & Decisions</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="timeline" className="mt-6">
+          <JourneyTimeline userId={userId} />
+        </TabsContent>
+
+        <TabsContent value="pivots" className="mt-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-2xl font-bold text-foreground">Documented Pivots</h3>
+              <p className="text-muted-foreground mt-1">Major changes and key decisions</p>
+            </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2" onClick={() => resetForm()}>
@@ -304,6 +322,8 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
           ))}
         </div>
       )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
