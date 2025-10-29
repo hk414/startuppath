@@ -784,7 +784,7 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                 
                 <Button 
                   onClick={generateAIInsights}
-                  disabled={isAnalyzing || !isPremiumUser}
+                  disabled={isAnalyzing}
                   className="w-full"
                   size="lg"
                   variant={!isPremiumUser ? "outline" : "default"}
@@ -792,7 +792,7 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                   {!isPremiumUser ? (
                     <>
                       <Lock className="w-4 h-4 mr-2" />
-                      Locked - Upgrade to Premium
+                      Unlock with Premium
                     </>
                   ) : isAnalyzing ? (
                     <>
@@ -846,7 +846,7 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                 <div className="space-y-2">
                   <Button 
                     onClick={generateInvestorReport}
-                    disabled={generatingReport || !isPremiumUser}
+                    disabled={generatingReport}
                     className="w-full"
                     size="lg"
                     variant={!isPremiumUser ? "outline" : "default"}
@@ -854,7 +854,7 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                     {!isPremiumUser ? (
                       <>
                         <Lock className="w-4 h-4 mr-2" />
-                        Locked - Upgrade to Premium
+                        Unlock with Premium
                       </>
                     ) : generatingReport ? (
                       <>
