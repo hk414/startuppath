@@ -37,7 +37,7 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
   const [challenges, setChallenges] = useState<string[]>([]);
 
   const expertiseOptions = ["product", "marketing", "sales", "fundraising", "operations", "tech", "hr", "legal", "design"];
-  const stageOptions = ["idea", "prototype", "early_growth", "scaling", "established"];
+  const stageOptions = ["idea", "validation", "building", "testing", "launch", "growth", "scaling"];
 
   const handleSubmit = async () => {
     try {
@@ -46,16 +46,19 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
         if (!title || expertise.length === 0) {
           toast({
             title: "Missing Information",
-            description: "Please fill in your title and select at least one expertise area.",
+            description: "Please add your title and at least one expertise area.",
             variant: "destructive",
           });
           return;
         }
       } else {
-        if (!industry || !startupStage || goals.length === 0 || challenges.length === 0) {
+        if (!industry || !startupStage) {
+          const missing: string[] = [];
+          if (!industry) missing.push("industry");
+          if (!startupStage) missing.push("stage");
           toast({
             title: "Missing Information",
-            description: "Please fill in industry, stage, and add at least one goal and challenge.",
+            description: `Please fill in: ${missing.join(", ")}. Goals and challenges are optional (press Enter to add).`,
             variant: "destructive",
           });
           return;
@@ -324,22 +327,24 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
               </div>
 
               <div>
-                <Label>Goals (at least one required)</Label>
+                <Label>Goals (optional)</Label>
                 <div className="space-y-2 mt-2">
                   <div className="flex gap-2">
                     <Input
                       placeholder="Add a goal (e.g., Raise seed funding)"
-                      onKeyPress={(e) => {
+                      onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                          const value = e.currentTarget.value.trim();
+                          e.preventDefault();
+                          const value = (e.currentTarget as HTMLInputElement).value.trim();
                           if (value && !goals.includes(value)) {
                             setGoals([...goals, value]);
-                            e.currentTarget.value = '';
+                            (e.currentTarget as HTMLInputElement).value = '';
                           }
                         }
                       }}
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground">Press Enter to add a goal</p>
                   <div className="flex flex-wrap gap-2">
                     {goals.map((goal, idx) => (
                       <Badge key={idx} variant="secondary">
@@ -355,22 +360,24 @@ const ProfileSetup = ({ userId, onComplete }: ProfileSetupProps) => {
               </div>
 
               <div>
-                <Label>Challenges (at least one required)</Label>
+                <Label>Challenges (optional)</Label>
                 <div className="space-y-2 mt-2">
                   <div className="flex gap-2">
                     <Input
                       placeholder="Add a challenge (e.g., Finding product-market fit)"
-                      onKeyPress={(e) => {
+                      onKeyDown={(e) => {
                         if (e.key === 'Enter') {
-                          const value = e.currentTarget.value.trim();
+                          e.preventDefault();
+                          const value = (e.currentTarget as HTMLInputElement).value.trim();
                           if (value && !challenges.includes(value)) {
                             setChallenges([...challenges, value]);
-                            e.currentTarget.value = '';
+                            (e.currentTarget as HTMLInputElement).value = '';
                           }
                         }
                       }}
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground">Press Enter to add a challenge</p>
                   <div className="flex flex-wrap gap-2">
                     {challenges.map((challenge, idx) => (
                       <Badge key={idx} variant="secondary">
