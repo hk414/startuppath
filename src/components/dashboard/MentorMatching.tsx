@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ProfileSetup from "@/components/matching/ProfileSetup";
+import MentorBrowser from "@/components/matching/MentorBrowser";
+import MatchRequests from "@/components/matching/MatchRequests";
+import MatchesList from "@/components/matching/MatchesList";
+import ChatWindow from "@/components/matching/ChatWindow";
+import SessionScheduler from "@/components/matching/SessionScheduler";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, MessageSquare, Plus } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Users, Calendar, MessageSquare, Plus, UserPlus } from "lucide-react";
 
 interface MentorMatchingProps {
   userId: string;
@@ -14,10 +20,17 @@ const MentorMatching = ({ userId }: MentorMatchingProps) => {
   const [hasProfile, setHasProfile] = useState<boolean | null>(null);
   const [hasMenteeProfile, setHasMenteeProfile] = useState(false);
   const [hasMentorProfile, setHasMentorProfile] = useState(false);
+  const [menteeProfileId, setMenteeProfileId] = useState<string | null>(null);
+  const [mentorProfileId, setMentorProfileId] = useState<string | null>(null);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [activeChatMatchId, setActiveChatMatchId] = useState<string | null>(null);
+  const [activeChatUserId, setActiveChatUserId] = useState<string | null>(null);
+  const [activeScheduleMatchId, setActiveScheduleMatchId] = useState<string | null>(null);
+  const [stats, setStats] = useState({ matches: 0, sessions: 0, messages: 0 });
 
   useEffect(() => {
     checkProfile();
+    fetchStats();
   }, [userId]);
 
   const checkProfile = async () => {
@@ -37,12 +50,54 @@ const MentorMatching = ({ userId }: MentorMatchingProps) => {
 
     setHasMenteeProfile(!!menteeData);
     setHasMentorProfile(!!mentorData);
+    setMenteeProfileId(menteeData?.id || null);
+    setMentorProfileId(mentorData?.id || null);
     setHasProfile(!!menteeData || !!mentorData);
+  };
+
+  const fetchStats = async () => {
+    const { data: menteeProfile } = await supabase
+      .from("mentee_profiles")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    const { data: mentorProfile } = await supabase
+      .from("mentor_profiles")
+      .select("id")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    let matchesCount = 0;
+    let sessionsCount = 0;
+
+    if (menteeProfile) {
+      const { count: menteeMatches } = await supabase
+        .from("matches")
+        .select("*", { count: "exact", head: true })
+        .eq("mentee_id", menteeProfile.id)
+        .eq("status", "active");
+      
+      matchesCount += menteeMatches || 0;
+    }
+
+    if (mentorProfile) {
+      const { count: mentorMatches } = await supabase
+        .from("matches")
+        .select("*", { count: "exact", head: true })
+        .eq("mentor_id", mentorProfile.id)
+        .eq("status", "active");
+      
+      matchesCount += mentorMatches || 0;
+    }
+
+    setStats({ matches: matchesCount, sessions: sessionsCount, messages: 0 });
   };
 
   const handleProfileComplete = () => {
     setShowProfileSetup(false);
     checkProfile();
+    fetchStats();
   };
 
   if (hasProfile === null) {
@@ -108,14 +163,14 @@ const MentorMatching = ({ userId }: MentorMatchingProps) => {
         )}
       </div>
 
-      {/* Dashboard Content */}
+      {/* Stats Dashboard */}
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="p-6">
           <div className="flex items-center gap-3 mb-4">
             <Users className="w-5 h-5 text-primary" />
             <h3 className="font-semibold">Matches</h3>
           </div>
-          <p className="text-3xl font-bold">0</p>
+          <p className="text-3xl font-bold">{stats.matches}</p>
           <p className="text-sm text-muted-foreground mt-1">
             {hasMentorProfile ? "Mentees connected" : "Mentors connected"}
           </p>
@@ -126,7 +181,7 @@ const MentorMatching = ({ userId }: MentorMatchingProps) => {
             <Calendar className="w-5 h-5 text-primary" />
             <h3 className="font-semibold">Sessions</h3>
           </div>
-          <p className="text-3xl font-bold">0</p>
+          <p className="text-3xl font-bold">{stats.sessions}</p>
           <p className="text-sm text-muted-foreground mt-1">
             Upcoming mentorship sessions
           </p>
@@ -137,21 +192,109 @@ const MentorMatching = ({ userId }: MentorMatchingProps) => {
             <MessageSquare className="w-5 h-5 text-primary" />
             <h3 className="font-semibold">Messages</h3>
           </div>
-          <p className="text-3xl font-bold">0</p>
+          <p className="text-3xl font-bold">{stats.messages}</p>
           <p className="text-sm text-muted-foreground mt-1">
             Unread messages
           </p>
         </Card>
       </div>
 
-      <Card className="p-8">
-        <div className="text-center">
-          <h3 className="text-lg font-semibold mb-2">Coming Soon</h3>
-          <p className="text-muted-foreground">
-            Mentor matching, session scheduling, and messaging features are being developed.
-          </p>
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="browse" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="browse">
+            <UserPlus className="w-4 h-4 mr-2" />
+            {hasMenteeProfile ? "Find Mentors" : "Find Mentees"}
+          </TabsTrigger>
+          <TabsTrigger value="requests">
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Requests
+          </TabsTrigger>
+          <TabsTrigger value="matches">
+            <Users className="w-4 h-4 mr-2" />
+            My Matches
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="browse" className="mt-6">
+          {hasMenteeProfile && menteeProfileId && (
+            <MentorBrowser menteeProfileId={menteeProfileId} />
+          )}
+          {!hasMenteeProfile && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">
+                Mentor browsing coming soon for mentor profiles
+              </p>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="requests" className="mt-6">
+          {menteeProfileId && (
+            <MatchRequests profileId={menteeProfileId} isMentor={false} />
+          )}
+          {mentorProfileId && !menteeProfileId && (
+            <MatchRequests profileId={mentorProfileId} isMentor={true} />
+          )}
+        </TabsContent>
+
+        <TabsContent value="matches" className="mt-6">
+          {menteeProfileId && (
+            <MatchesList
+              profileId={menteeProfileId}
+              isMentor={false}
+              onOpenChat={(matchId, otherUserId) => {
+                setActiveChatMatchId(matchId);
+                setActiveChatUserId(otherUserId);
+              }}
+              onScheduleSession={(matchId) => setActiveScheduleMatchId(matchId)}
+            />
+          )}
+          {mentorProfileId && !menteeProfileId && (
+            <MatchesList
+              profileId={mentorProfileId}
+              isMentor={true}
+              onOpenChat={(matchId, otherUserId) => {
+                setActiveChatMatchId(matchId);
+                setActiveChatUserId(otherUserId);
+              }}
+              onScheduleSession={(matchId) => setActiveScheduleMatchId(matchId)}
+            />
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Chat Window Overlay */}
+      {activeChatMatchId && activeChatUserId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-2xl">
+            <ChatWindow
+              matchId={activeChatMatchId}
+              currentUserId={userId}
+              otherUserId={activeChatUserId}
+              onClose={() => {
+                setActiveChatMatchId(null);
+                setActiveChatUserId(null);
+              }}
+            />
+          </div>
         </div>
-      </Card>
+      )}
+
+      {/* Session Scheduler Overlay */}
+      {activeScheduleMatchId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-2xl">
+            <SessionScheduler
+              matchId={activeScheduleMatchId}
+              onClose={() => {
+                setActiveScheduleMatchId(null);
+                fetchStats();
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
