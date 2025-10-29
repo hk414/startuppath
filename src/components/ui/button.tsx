@@ -5,23 +5,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold font-sans tracking-wide transition-all duration-300 ease-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft hover:shadow-glow",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border-2 border-primary text-primary bg-background hover:bg-primary hover:text-primary-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-soft",
-        ghost: "hover:bg-accent/10 hover:text-accent",
-        link: "text-primary underline-offset-4 hover:underline",
-        hero: "bg-gradient-hero text-primary-foreground hover:shadow-glow shadow-strong scale-100 hover:scale-105",
-        accent: "bg-gradient-accent text-accent-foreground hover:shadow-strong shadow-soft scale-100 hover:scale-105",
+        default: "bg-primary text-primary-foreground hover:bg-primary-deep shadow-medium hover:shadow-glow hover:scale-[1.02] active:scale-[0.98]",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-medium hover:shadow-strong",
+        outline: "border-2 border-primary/30 text-primary-deep bg-background hover:bg-primary/10 hover:border-primary shadow-soft",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-medium hover:shadow-glow-secondary hover:scale-[1.02] active:scale-[0.98]",
+        ghost: "hover:bg-accent-light hover:text-primary-deep",
+        link: "text-primary-deep underline-offset-4 hover:underline",
+        hero: "bg-gradient-hero text-primary-foreground hover:shadow-glow shadow-medium hover:scale-[1.03] active:scale-[0.98] font-heading",
+        accent: "bg-gradient-accent text-secondary-foreground hover:shadow-glow-secondary shadow-medium hover:scale-[1.03] active:scale-[0.98] font-heading",
       },
       size: {
         default: "h-11 px-6 py-2.5",
-        sm: "h-9 rounded-md px-4 text-xs",
-        lg: "h-14 rounded-xl px-10 text-base",
+        sm: "h-9 rounded-lg px-4 text-xs",
+        lg: "h-14 rounded-2xl px-10 text-base",
         icon: "h-11 w-11",
       },
     },
