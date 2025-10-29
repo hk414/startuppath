@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Sparkles, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -39,6 +39,8 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   const [outcome, setOutcome] = useState("");
   const [lessonsLearned, setLessonsLearned] = useState("");
   const [pivotDate, setPivotDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [aiInsights, setAiInsights] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -138,6 +140,40 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
     setIsOpen(true);
   };
 
+  const generateAIInsights = async () => {
+    if (pivots.length === 0) {
+      toast({
+        title: "No pivots to analyze",
+        description: "Document some pivots first to get AI insights.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-pivots', {
+        body: { pivots }
+      });
+
+      if (error) throw error;
+
+      setAiInsights(data.insights);
+      toast({
+        title: "Analysis Complete! ✨",
+        description: "AI has analyzed your pivot history.",
+      });
+    } catch (error) {
+      toast({
+        title: "Analysis Failed",
+        description: "Could not generate insights. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -156,6 +192,55 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
         </TabsContent>
 
         <TabsContent value="pivots" className="mt-6">
+          {/* AI Insights Section */}
+          {pivots.length > 0 && (
+            <Card className="p-6 mb-6 bg-gradient-hero/5 border-primary/20">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">AI Insights</h3>
+                    <p className="text-sm text-muted-foreground">Patterns and learnings from your pivot journey</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={generateAIInsights}
+                  disabled={isAnalyzing}
+                  size="sm"
+                  className="gap-2"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Generate Insights
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {aiInsights ? (
+                <div className="space-y-4 mt-4">
+                  <div className="prose prose-sm max-w-none">
+                    <div className="bg-background/50 rounded-lg p-4 whitespace-pre-wrap text-foreground">
+                      {aiInsights}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Click "Generate Insights" to get AI-powered analysis of your pivots</p>
+                </div>
+              )}
+            </Card>
+          )}
+
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-2xl font-bold text-foreground">Documented Pivots</h3>
