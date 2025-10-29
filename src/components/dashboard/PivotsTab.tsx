@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, Edit2, Trash2, Sparkles, TrendingUp, AlertCircle, Loader2, FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import JourneyTimeline from "./JourneyTimeline";
+import ReactMarkdown from 'react-markdown';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import pptxgen from 'pptxgenjs';
 
 interface Pivot {
   id: string;
@@ -46,6 +51,7 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   const [generatingReport, setGeneratingReport] = useState(false);
   const [startupName, setStartupName] = useState("");
   const [currentStage, setCurrentStage] = useState("");
+  const reportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -242,6 +248,105 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const downloadPDF = async () => {
+    if (!reportRef.current) return;
+
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${startupName.replace(/\s+/g, '-')}-investor-report.pdf`);
+      
+      toast({
+        title: "PDF Downloaded! 📄",
+        description: "Your investor report has been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: "Could not generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const downloadPPTX = async () => {
+    try {
+      const pptx = new pptxgen();
+      
+      // Parse markdown into slides
+      const sections = investorReport.split('\n## ').filter(s => s.trim());
+      
+      sections.forEach((section, idx) => {
+        const slide = pptx.addSlide();
+        const lines = section.split('\n').filter(l => l.trim());
+        
+        // Title (first line)
+        const title = lines[0].replace(/^# /, '');
+        slide.addText(title, {
+          x: 0.5,
+          y: 0.5,
+          w: '90%',
+          h: 1,
+          fontSize: 32,
+          bold: true,
+          color: '363636',
+        });
+
+        // Content
+        const content = lines.slice(1).join('\n');
+        slide.addText(content, {
+          x: 0.5,
+          y: 1.8,
+          w: '90%',
+          h: 4.5,
+          fontSize: 14,
+          color: '666666',
+          valign: 'top',
+        });
+      });
+
+      await pptx.writeFile({ fileName: `${startupName.replace(/\s+/g, '-')}-investor-report.pptx` });
+      
+      toast({
+        title: "PPTX Downloaded! 📊",
+        description: "Your investor presentation has been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Download Failed",
+        description: "Could not generate PPTX. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -509,44 +614,56 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                        Generate Report
                      </>
                    )}
-                 </Button>
-                 {investorReport && (
-                   <Button 
-                     onClick={downloadReport}
-                     size="sm"
-                     variant="outline"
-                     className="gap-2"
-                   >
-                     <Download className="w-4 h-4" />
-                     Download
-                   </Button>
-                 )}
+               </Button>
+               {investorReport && (
+                 <DropdownMenu>
+                   <DropdownMenuTrigger asChild>
+                     <Button 
+                       size="sm"
+                       variant="outline"
+                       className="gap-2"
+                     >
+                       <Download className="w-4 h-4" />
+                       Download
+                     </Button>
+                   </DropdownMenuTrigger>
+                   <DropdownMenuContent>
+                     <DropdownMenuItem onClick={downloadPDF}>
+                       Download as PDF
+                     </DropdownMenuItem>
+                     <DropdownMenuItem onClick={downloadPPTX}>
+                       Download as PPTX
+                     </DropdownMenuItem>
+                     <DropdownMenuItem onClick={downloadReport}>
+                       Download as Markdown
+                     </DropdownMenuItem>
+                   </DropdownMenuContent>
+                 </DropdownMenu>
+               )}
                </div>
              </div>
 
              {showInvestorReport && investorReport ? (
                <div className="space-y-4 mt-4">
-                 <div className="prose prose-sm max-w-none dark:prose-invert">
-                   <div className="bg-background/50 rounded-lg p-6 border border-border">
-                     <div className="whitespace-pre-wrap text-foreground">
-                       {investorReport.split('\n').map((line, idx) => {
-                         // Render markdown-style headers
-                         if (line.startsWith('# ')) {
-                           return <h1 key={idx} className="text-2xl font-bold mt-6 mb-3">{line.slice(2)}</h1>;
-                         } else if (line.startsWith('## ')) {
-                           return <h2 key={idx} className="text-xl font-bold mt-5 mb-2">{line.slice(3)}</h2>;
-                         } else if (line.startsWith('### ')) {
-                           return <h3 key={idx} className="text-lg font-semibold mt-4 mb-2">{line.slice(4)}</h3>;
-                         } else if (line.startsWith('**') && line.endsWith('**')) {
-                           return <p key={idx} className="font-bold my-2">{line.slice(2, -2)}</p>;
-                         } else if (line.trim() === '') {
-                           return <br key={idx} />;
-                         } else {
-                           return <p key={idx} className="my-2">{line}</p>;
-                         }
-                       })}
-                     </div>
-                   </div>
+                 <div 
+                   ref={reportRef}
+                   className="prose prose-sm max-w-none dark:prose-invert bg-background/50 rounded-lg p-6 border border-border"
+                 >
+                   <ReactMarkdown
+                     components={{
+                       h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-6 mb-4 text-foreground" {...props} />,
+                       h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-5 mb-3 text-foreground" {...props} />,
+                       h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-4 mb-2 text-foreground" {...props} />,
+                       p: ({node, ...props}) => <p className="my-3 text-foreground leading-relaxed" {...props} />,
+                       strong: ({node, ...props}) => <strong className="font-bold text-foreground" {...props} />,
+                       em: ({node, ...props}) => <em className="italic text-foreground" {...props} />,
+                       ul: ({node, ...props}) => <ul className="list-disc list-inside my-3 space-y-1 text-foreground" {...props} />,
+                       ol: ({node, ...props}) => <ol className="list-decimal list-inside my-3 space-y-1 text-foreground" {...props} />,
+                       li: ({node, ...props}) => <li className="text-foreground" {...props} />,
+                     }}
+                   >
+                     {investorReport}
+                   </ReactMarkdown>
                  </div>
                </div>
              ) : (
