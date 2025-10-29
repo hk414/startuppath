@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/startuppath-logo.jpg";
 import DashboardHome from "./DashboardHome";
 import JournalTab from "./JournalTab";
@@ -112,6 +113,11 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
         </nav>
 
         <div className="p-4 border-t border-border space-y-2">
+          {/* Theme Toggle */}
+          <div className={`flex ${!sidebarOpen ? 'justify-center' : 'justify-start px-2'}`}>
+            <ThemeToggle />
+          </div>
+
           {/* Font Size Controls */}
           <div className={`flex items-center gap-1 border border-border rounded-lg p-1 ${!sidebarOpen ? 'flex-col' : ''}`}>
             <Button
