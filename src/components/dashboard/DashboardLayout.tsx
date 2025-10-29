@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
-import { Home, BookOpen, Lightbulb, GitBranch, Users, LogOut, Menu, Gamepad2, ZoomIn, ZoomOut } from "lucide-react";
+import { Home, BookOpen, Lightbulb, GitBranch, Users, LogOut, Menu, Gamepad2, ZoomIn, ZoomOut, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -79,6 +79,18 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
             className={!sidebarOpen ? "mx-auto mt-2" : ""}
           >
             <Menu className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Back to Home Button */}
+        <div className={`p-4 border-b border-border ${!sidebarOpen ? 'flex justify-center' : ''}`}>
+          <Button
+            variant="outline"
+            className={`w-full justify-start ${!sidebarOpen ? 'w-auto px-3' : ''}`}
+            onClick={() => navigate("/")}
+          >
+            <ArrowLeft className="w-5 h-5 flex-shrink-0" />
+            {sidebarOpen && <span className="ml-3">Back to Home</span>}
           </Button>
         </div>
 
