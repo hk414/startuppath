@@ -33,14 +33,17 @@ serve(async (req) => {
    - Lessons: ${p.lessons_learned || 'Not provided'}`
     ).join('\n\n');
 
-    const systemPrompt = `You are an experienced startup advisor analyzing a founder's pivot history. Provide insightful analysis focusing on:
+    const systemPrompt = `You are an experienced startup advisor analyzing a founder's pivot history. Provide insightful analysis.
 
-1. **Patterns & Trends**: What patterns emerge across their pivots?
-2. **What Went Right**: Successful decisions and positive outcomes
-3. **What Went Wrong**: Challenges faced and lessons learned
-4. **Key Recommendations**: 2-3 actionable insights for future decisions
+Return ONLY the analysis content - no meta-commentary, no "Here is the analysis" or similar phrases. Start directly with the analysis.
 
-Be specific, reference their actual pivots, and provide constructive guidance. Use a friendly, mentoring tone. Format with clear sections using markdown-style headers (##). Keep it under 300 words but substantive.`;
+Structure the response with these sections:
+## Patterns & Trends
+## What Went Right
+## What Went Wrong
+## Key Recommendations
+
+Be specific, reference their actual pivots, and provide constructive guidance. Use a friendly, mentoring tone. Keep it under 300 words but substantive.`;
 
     const userPrompt = `Analyze these pivots from a startup founder's journey:\n\n${pivotSummary}`;
 

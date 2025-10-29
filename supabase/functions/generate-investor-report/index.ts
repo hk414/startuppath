@@ -25,10 +25,11 @@ serve(async (req) => {
 
     console.log('Generating investor report for', pivots.length, 'pivots');
 
-    const systemPrompt = `You are an expert startup advisor and pitch deck creator. Your task is to create a compelling investor presentation based on a startup's pivot history. 
+    const systemPrompt = `You are an expert startup advisor and pitch deck creator. Your task is to create a compelling investor presentation based on a startup's pivot history.
 
-Create a professional, investment-ready report in markdown format that tells the story of resilience, learning, and strategic growth. Structure it as:
+CRITICAL: Return ONLY the report content - no introductory phrases like "Here is the report", no meta-commentary, no explanations about what you're doing. Start directly with the report title.
 
+Structure the report exactly as follows:
 # [Startup Name] - Investor Report
 ## Executive Summary
 ## Our Journey: Key Strategic Pivots
@@ -39,10 +40,9 @@ Create a professional, investment-ready report in markdown format that tells the
 
 Make it compelling, data-driven where possible, and focus on how the pivots demonstrate market validation, founder resilience, and strategic thinking. Use professional language suitable for investors.`;
 
-    const userPrompt = `Create an investor presentation for ${startupName || 'our startup'}, currently at ${currentStage || 'growth'} stage.
+    const userPrompt = `Generate an investor presentation for ${startupName || 'our startup'}, currently at ${currentStage || 'growth'} stage.
 
-Here is our pivot history:
-
+Pivot history:
 ${pivots.map((pivot: any, idx: number) => `
 **Pivot ${idx + 1}: ${pivot.title}** (${new Date(pivot.pivot_date).toLocaleDateString()})
 - Decision: ${pivot.decision_made}
@@ -51,14 +51,7 @@ ${pivots.map((pivot: any, idx: number) => `
 - Key Lessons: ${pivot.lessons_learned || 'N/A'}
 `).join('\n')}
 
-Generate a compelling investor report that:
-1. Shows our journey and strategic thinking
-2. Highlights key learnings and market insights
-3. Demonstrates founder resilience and adaptability
-4. Positions us as a strong investment opportunity
-5. Includes a clear vision for the future
-
-Make it professional, concise (2-3 pages), and investment-ready.`;
+Create a professional, concise (2-3 pages), investment-ready report.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

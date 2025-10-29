@@ -350,27 +350,27 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold text-foreground">Pivot Tracker</h2>
-        <p className="text-muted-foreground mt-1">Track your journey and document major decisions</p>
+    <div className="space-y-8">
+      <div className="space-y-2">
+        <h2 className="text-4xl font-heading font-bold text-foreground">Pivot Tracker</h2>
+        <p className="text-lg text-muted-foreground">Track your journey and document major decisions</p>
       </div>
 
       <Tabs defaultValue="timeline" className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="timeline">Journey Timeline</TabsTrigger>
-          <TabsTrigger value="pivots">Pivots & Decisions</TabsTrigger>
+        <TabsList className="grid w-full max-w-md grid-cols-2 h-12">
+          <TabsTrigger value="timeline" className="font-heading">Journey Timeline</TabsTrigger>
+          <TabsTrigger value="pivots" className="font-heading">Pivots & Decisions</TabsTrigger>
         </TabsList>
 
         <TabsContent value="timeline" className="mt-6">
           <JourneyTimeline userId={userId} />
         </TabsContent>
 
-        <TabsContent value="pivots" className="mt-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-2xl font-bold text-foreground">Documented Pivots</h3>
-              <p className="text-muted-foreground mt-1">Major changes and key decisions</p>
+        <TabsContent value="pivots" className="mt-8">
+          <div className="flex items-center justify-between mb-8">
+            <div className="space-y-1">
+              <h3 className="text-2xl font-heading font-bold text-foreground">Documented Pivots</h3>
+              <p className="text-muted-foreground">Major changes and strategic decisions</p>
             </div>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
@@ -468,64 +468,77 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
       </div>
 
       {pivots.length === 0 ? (
-        <Card className="p-12 text-center">
-          <p className="text-muted-foreground mb-4">No pivots documented yet</p>
-          <Button onClick={() => setIsOpen(true)}>Document your first pivot</Button>
+        <Card className="p-16 text-center bg-gradient-card">
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+              <Plus className="w-8 h-8 text-primary" />
+            </div>
+            <p className="text-lg text-muted-foreground">No pivots documented yet</p>
+            <p className="text-sm text-muted-foreground">Start tracking your startup's evolution and strategic decisions</p>
+            <Button onClick={() => setIsOpen(true)} size="lg" className="mt-4">
+              Document Your First Pivot
+            </Button>
+          </div>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-6">
           {pivots.map((pivot) => (
-            <Card key={pivot.id} className="p-6 hover:shadow-strong transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-foreground">{pivot.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
+            <Card key={pivot.id} className="p-8 hover:shadow-glow transition-all duration-300 hover:scale-[1.01]">
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex-1 space-y-2">
+                  <h3 className="text-2xl font-heading font-bold text-foreground">{pivot.title}</h3>
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     {format(new Date(pivot.pivot_date), "MMMM d, yyyy")}
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => startEdit(pivot)}>
+                  <Button variant="ghost" size="icon" onClick={() => startEdit(pivot)} className="hover:bg-primary/10">
                     <Edit2 className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleDelete(pivot.id)}
+                    className="hover:bg-destructive/10 hover:text-destructive"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
               
-              <div className="space-y-3 text-sm">
-                <div>
-                  <p className="text-muted-foreground font-medium mb-1">What Changed:</p>
-                  <p className="text-foreground">{pivot.description}</p>
+              <div className="space-y-5 text-sm">
+                <div className="bg-muted/30 p-4 rounded-xl">
+                  <p className="text-muted-foreground font-semibold mb-2 text-xs uppercase tracking-wide">What Changed</p>
+                  <p className="text-foreground leading-relaxed">{pivot.description}</p>
                 </div>
                 
-                <div>
-                  <p className="text-muted-foreground font-medium mb-1">Decision:</p>
-                  <p className="text-foreground">{pivot.decision_made}</p>
+                <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                  <p className="text-primary font-semibold mb-2 text-xs uppercase tracking-wide">Decision Made</p>
+                  <p className="text-foreground leading-relaxed">{pivot.decision_made}</p>
                 </div>
                 
                 {pivot.reasoning && (
-                  <div>
-                    <p className="text-muted-foreground font-medium mb-1">Why:</p>
-                    <p className="text-foreground">{pivot.reasoning}</p>
+                  <div className="p-4 rounded-xl bg-background border border-border">
+                    <p className="text-muted-foreground font-semibold mb-2 text-xs uppercase tracking-wide">Reasoning</p>
+                    <p className="text-foreground leading-relaxed">{pivot.reasoning}</p>
                   </div>
                 )}
                 
                 {pivot.outcome && (
-                  <div>
-                    <p className="text-muted-foreground font-medium mb-1">Outcome:</p>
-                    <p className="text-foreground">{pivot.outcome}</p>
+                  <div className="p-4 rounded-xl bg-secondary/5 border border-secondary/10">
+                    <p className="text-secondary-foreground font-semibold mb-2 text-xs uppercase tracking-wide">Outcome</p>
+                    <p className="text-foreground leading-relaxed">{pivot.outcome}</p>
                   </div>
                 )}
                 
                 {pivot.lessons_learned && (
-                  <div className="mt-4 p-4 bg-accent-light rounded-lg">
-                    <p className="text-accent font-medium mb-1">💡 Lessons Learned:</p>
-                    <p className="text-foreground">{pivot.lessons_learned}</p>
+                  <div className="mt-2 p-5 bg-gradient-accent/10 rounded-xl border border-accent/20">
+                    <p className="text-accent font-semibold mb-2 flex items-center gap-2">
+                      <span className="text-lg">💡</span>
+                      <span className="text-xs uppercase tracking-wide">Lessons Learned</span>
+                    </p>
+                    <p className="text-foreground leading-relaxed">{pivot.lessons_learned}</p>
                   </div>
                 )}
               </div>
@@ -536,23 +549,23 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
 
        {/* AI Features Section - After Pivots */}
        {pivots.length > 0 && (
-         <div className="space-y-4">
+         <div className="space-y-6 mt-12">
            {/* AI Insights Card */}
-           <Card className="p-6 bg-gradient-hero/5 border-primary/20">
-             <div className="flex items-start justify-between mb-4">
-               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                   <Sparkles className="w-5 h-5 text-primary" />
+           <Card className="p-8 bg-gradient-hero/5 border-primary/20 hover:shadow-glow transition-all duration-300">
+             <div className="flex items-start justify-between mb-6">
+               <div className="flex items-center gap-4">
+                 <div className="w-12 h-12 rounded-xl bg-gradient-hero flex items-center justify-center shadow-glow">
+                   <Sparkles className="w-6 h-6 text-primary-foreground" />
                  </div>
                  <div>
-                   <h3 className="text-lg font-semibold text-foreground">AI Insights</h3>
-                   <p className="text-sm text-muted-foreground">Patterns and learnings from your pivot journey</p>
+                   <h3 className="text-xl font-heading font-bold text-foreground">AI Insights</h3>
+                   <p className="text-sm text-muted-foreground mt-1">Patterns and learnings from your pivot journey</p>
                  </div>
                </div>
                <Button 
                  onClick={generateAIInsights}
                  disabled={isAnalyzing}
-                 size="sm"
+                 size="lg"
                  className="gap-2"
                >
                  {isAnalyzing ? (
@@ -570,37 +583,47 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
              </div>
 
              {aiInsights ? (
-               <div className="space-y-4 mt-4">
-                 <div className="prose prose-sm max-w-none">
-                   <div className="bg-background/50 rounded-lg p-4 whitespace-pre-wrap text-foreground">
+               <div className="mt-6">
+                 <div className="prose prose-sm max-w-none dark:prose-invert bg-background/60 rounded-xl p-6 border border-border">
+                   <ReactMarkdown
+                     components={{
+                       h2: ({node, ...props}) => <h2 className="text-xl font-heading font-bold mt-4 mb-3 text-foreground first:mt-0" {...props} />,
+                       h3: ({node, ...props}) => <h3 className="text-lg font-heading font-semibold mt-3 mb-2 text-foreground" {...props} />,
+                       p: ({node, ...props}) => <p className="my-2 text-foreground leading-relaxed" {...props} />,
+                       strong: ({node, ...props}) => <strong className="font-bold text-foreground" {...props} />,
+                       ul: ({node, ...props}) => <ul className="list-disc list-inside my-2 space-y-1 text-foreground" {...props} />,
+                       li: ({node, ...props}) => <li className="text-foreground" {...props} />,
+                     }}
+                   >
                      {aiInsights}
-                   </div>
+                   </ReactMarkdown>
                  </div>
                </div>
              ) : (
-               <div className="text-center py-8 text-muted-foreground">
-                 <p>Click "Generate Insights" to get AI-powered analysis of your pivots</p>
+               <div className="text-center py-12 text-muted-foreground">
+                 <Sparkles className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                 <p className="text-base">Click "Generate Insights" to get AI-powered analysis of your pivots</p>
                </div>
              )}
            </Card>
 
            {/* Investor Report Card */}
-           <Card className="p-6 bg-gradient-hero/5 border-accent/20">
-             <div className="flex items-start justify-between mb-4">
-               <div className="flex items-center gap-3">
-                 <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
-                   <FileText className="w-5 h-5 text-accent" />
+           <Card className="p-8 bg-gradient-accent/5 border-secondary/20 hover:shadow-glow-secondary transition-all duration-300">
+             <div className="flex items-start justify-between mb-6">
+               <div className="flex items-center gap-4">
+                 <div className="w-12 h-12 rounded-xl bg-gradient-accent flex items-center justify-center shadow-glow-secondary">
+                   <FileText className="w-6 h-6 text-secondary-foreground" />
                  </div>
                  <div>
-                   <h3 className="text-lg font-semibold text-foreground">Investor Presentation</h3>
-                   <p className="text-sm text-muted-foreground">Generate a compelling report for investors</p>
+                   <h3 className="text-xl font-heading font-bold text-foreground">Investor Presentation</h3>
+                   <p className="text-sm text-muted-foreground mt-1">Generate a compelling report for investors</p>
                  </div>
                </div>
                <div className="flex gap-2">
                  <Button 
                    onClick={generateInvestorReport}
                    disabled={generatingReport}
-                   size="sm"
+                   size="lg"
                    className="gap-2"
                  >
                    {generatingReport ? (
@@ -619,7 +642,7 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                  <DropdownMenu>
                    <DropdownMenuTrigger asChild>
                      <Button 
-                       size="sm"
+                       size="lg"
                        variant="outline"
                        className="gap-2"
                      >
@@ -644,22 +667,22 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
              </div>
 
              {showInvestorReport && investorReport ? (
-               <div className="space-y-4 mt-4">
+               <div className="mt-6">
                  <div 
                    ref={reportRef}
-                   className="prose prose-sm max-w-none dark:prose-invert bg-background/50 rounded-lg p-6 border border-border"
+                   className="prose prose-sm max-w-none dark:prose-invert bg-background/60 rounded-xl p-8 border border-border"
                  >
                    <ReactMarkdown
                      components={{
-                       h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-6 mb-4 text-foreground" {...props} />,
-                       h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-5 mb-3 text-foreground" {...props} />,
-                       h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-4 mb-2 text-foreground" {...props} />,
+                       h1: ({node, ...props}) => <h1 className="text-4xl font-heading font-bold mt-0 mb-6 text-foreground" {...props} />,
+                       h2: ({node, ...props}) => <h2 className="text-2xl font-heading font-bold mt-8 mb-4 text-foreground first:mt-0" {...props} />,
+                       h3: ({node, ...props}) => <h3 className="text-xl font-heading font-semibold mt-6 mb-3 text-foreground" {...props} />,
                        p: ({node, ...props}) => <p className="my-3 text-foreground leading-relaxed" {...props} />,
                        strong: ({node, ...props}) => <strong className="font-bold text-foreground" {...props} />,
                        em: ({node, ...props}) => <em className="italic text-foreground" {...props} />,
-                       ul: ({node, ...props}) => <ul className="list-disc list-inside my-3 space-y-1 text-foreground" {...props} />,
-                       ol: ({node, ...props}) => <ol className="list-decimal list-inside my-3 space-y-1 text-foreground" {...props} />,
-                       li: ({node, ...props}) => <li className="text-foreground" {...props} />,
+                       ul: ({node, ...props}) => <ul className="list-disc list-inside my-3 space-y-2 text-foreground" {...props} />,
+                       ol: ({node, ...props}) => <ol className="list-decimal list-inside my-3 space-y-2 text-foreground" {...props} />,
+                       li: ({node, ...props}) => <li className="text-foreground leading-relaxed" {...props} />,
                      }}
                    >
                      {investorReport}
@@ -667,10 +690,10 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
                  </div>
                </div>
              ) : (
-               <div className="text-center py-8 text-muted-foreground">
-                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                 <p className="mb-2">Generate a professional investor presentation</p>
-                 <p className="text-xs">Showcases your journey, resilience, and strategic thinking</p>
+               <div className="text-center py-12 text-muted-foreground">
+                 <FileText className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                 <p className="text-base mb-2">Generate a professional investor presentation</p>
+                 <p className="text-sm">Showcases your journey, resilience, and strategic thinking</p>
                </div>
              )}
            </Card>
