@@ -1,22 +1,25 @@
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
-import { BookOpen, Lightbulb, GitBranch, LogOut, Menu } from "lucide-react";
+import { Home, BookOpen, Lightbulb, GitBranch, Users, LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import DashboardHome from "./DashboardHome";
 import JournalTab from "./JournalTab";
 import PivotsTab from "./PivotsTab";
 import LessonsTab from "./LessonsTab";
+import MentorMatching from "./MentorMatching";
+import Guidebook from "@/pages/Guidebook";
 
 interface DashboardLayoutProps {
   user: User;
 }
 
-type Tab = "journal" | "pivots" | "lessons";
+type Tab = "home" | "guidebook" | "journal" | "pivots" | "lessons" | "matching";
 
 const DashboardLayout = ({ user }: DashboardLayoutProps) => {
-  const [activeTab, setActiveTab] = useState<Tab>("journal");
+  const [activeTab, setActiveTab] = useState<Tab>("home");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -31,9 +34,12 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
   };
 
   const tabs = [
-    { id: "journal" as Tab, label: "Journal", icon: BookOpen },
-    { id: "pivots" as Tab, label: "Pivots", icon: GitBranch },
+    { id: "home" as Tab, label: "Home", icon: Home },
+    { id: "guidebook" as Tab, label: "Guidebook", icon: BookOpen },
+    { id: "journal" as Tab, label: "Journal", icon: GitBranch },
+    { id: "pivots" as Tab, label: "Pivots", icon: Lightbulb },
     { id: "lessons" as Tab, label: "Lessons", icon: Lightbulb },
+    { id: "matching" as Tab, label: "Mentors", icon: Users },
   ];
 
   return (
@@ -94,9 +100,12 @@ const DashboardLayout = ({ user }: DashboardLayoutProps) => {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         <div className="max-w-7xl mx-auto p-6 md:p-8">
+          {activeTab === "home" && <DashboardHome onNavigate={setActiveTab} />}
+          {activeTab === "guidebook" && <Guidebook />}
           {activeTab === "journal" && <JournalTab userId={user.id} />}
           {activeTab === "pivots" && <PivotsTab userId={user.id} />}
           {activeTab === "lessons" && <LessonsTab userId={user.id} />}
+          {activeTab === "matching" && <MentorMatching userId={user.id} />}
         </div>
       </main>
     </div>
