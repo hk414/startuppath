@@ -43,7 +43,7 @@ const Header = () => {
               variant="ghost" 
               size="sm" 
               className="hidden md:inline-flex"
-              onClick={() => alert('Sign in functionality coming soon!')}
+              onClick={() => window.location.href = '/auth'}
             >
               Sign In
             </Button>
@@ -51,9 +51,9 @@ const Header = () => {
               variant="default" 
               size="sm" 
               className="shadow-soft"
-              onClick={() => scrollToSection('cta')}
+              onClick={() => window.location.href = '/dashboard'}
             >
-              Get Started
+              Dashboard
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="w-5 h-5" />
