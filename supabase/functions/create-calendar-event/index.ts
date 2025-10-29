@@ -1,5 +1,3 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.77.0'
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -11,7 +9,7 @@ interface CalendarEventRequest {
   startTime: string
   endTime: string
   attendees: string[]
-  accessToken: string
+  calendarId?: string
 }
 
 Deno.serve(async (req) => {
@@ -20,9 +18,16 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { summary, description, startTime, endTime, attendees, accessToken } = await req.json() as CalendarEventRequest
+    const { summary, description, startTime, endTime, attendees, calendarId = 'primary' } = await req.json() as CalendarEventRequest
+    
+    const googleApiKey = Deno.env.get('GOOGLE_API_KEY')
+    if (!googleApiKey) {
+      throw new Error('Google API key not configured')
+    }
 
-    // Create Google Calendar event
+    console.log('Creating calendar event:', { summary, startTime, endTime, attendees })
+
+    // Create Google Calendar event using API key
     const event = {
       summary,
       description,
@@ -51,11 +56,10 @@ Deno.serve(async (req) => {
     }
 
     const response = await fetch(
-      'https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1',
+      `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?conferenceDataVersion=1&key=${googleApiKey}`,
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(event),
@@ -64,10 +68,12 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const error = await response.text()
+      console.error('Google Calendar API error:', error)
       throw new Error(`Google Calendar API error: ${error}`)
     }
 
     const calendarEvent = await response.json()
+    console.log('Calendar event created successfully:', calendarEvent.id)
 
     return new Response(
       JSON.stringify({
