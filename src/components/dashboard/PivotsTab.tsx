@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Sparkles, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Sparkles, TrendingUp, AlertCircle, Loader2, FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -41,11 +41,30 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
   const [pivotDate, setPivotDate] = useState(format(new Date(), "yyyy-MM-dd"));
   const [aiInsights, setAiInsights] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [investorReport, setInvestorReport] = useState<string>("");
+  const [showInvestorReport, setShowInvestorReport] = useState(false);
+  const [generatingReport, setGeneratingReport] = useState(false);
+  const [startupName, setStartupName] = useState("");
+  const [currentStage, setCurrentStage] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
     fetchPivots();
+    fetchUserProfile();
   }, [userId]);
+
+  const fetchUserProfile = async () => {
+    const { data: menteeData } = await supabase
+      .from("mentee_profiles")
+      .select("startup_name, startup_stage")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (menteeData) {
+      setStartupName(menteeData.startup_name || "My Startup");
+      setCurrentStage(menteeData.startup_stage || "growth");
+    }
+  };
 
   const fetchPivots = async () => {
     const { data, error } = await supabase
@@ -172,6 +191,57 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const generateInvestorReport = async () => {
+    if (pivots.length === 0) {
+      toast({
+        title: "No pivots to analyze",
+        description: "Document some pivots first to generate a report.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGeneratingReport(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-investor-report', {
+        body: { 
+          pivots,
+          startupName,
+          currentStage 
+        }
+      });
+
+      if (error) throw error;
+
+      setInvestorReport(data.report);
+      setShowInvestorReport(true);
+      toast({
+        title: "Report Generated! 📊",
+        description: "Your investor presentation is ready.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Could not generate report. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingReport(false);
+    }
+  };
+
+  const downloadReport = () => {
+    const blob = new Blob([investorReport], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${startupName.replace(/\s+/g, '-')}-investor-report.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -359,53 +429,135 @@ const PivotsTab = ({ userId }: PivotsTabProps) => {
          </div>
        )}
 
-       {/* AI Insights Section - After Pivots */}
+       {/* AI Features Section - After Pivots */}
        {pivots.length > 0 && (
-         <Card className="p-6 mt-6 bg-gradient-hero/5 border-primary/20">
-           <div className="flex items-start justify-between mb-4">
-             <div className="flex items-center gap-3">
-               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                 <Sparkles className="w-5 h-5 text-primary" />
-               </div>
-               <div>
-                 <h3 className="text-lg font-semibold text-foreground">AI Insights</h3>
-                 <p className="text-sm text-muted-foreground">Patterns and learnings from your pivot journey</p>
-               </div>
-             </div>
-             <Button 
-               onClick={generateAIInsights}
-               disabled={isAnalyzing}
-               size="sm"
-               className="gap-2"
-             >
-               {isAnalyzing ? (
-                 <>
-                   <Loader2 className="w-4 h-4 animate-spin" />
-                   Analyzing...
-                 </>
-               ) : (
-                 <>
-                   <Sparkles className="w-4 h-4" />
-                   Generate Insights
-                 </>
-               )}
-             </Button>
-           </div>
-
-           {aiInsights ? (
-             <div className="space-y-4 mt-4">
-               <div className="prose prose-sm max-w-none">
-                 <div className="bg-background/50 rounded-lg p-4 whitespace-pre-wrap text-foreground">
-                   {aiInsights}
+         <div className="space-y-4">
+           {/* AI Insights Card */}
+           <Card className="p-6 bg-gradient-hero/5 border-primary/20">
+             <div className="flex items-start justify-between mb-4">
+               <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                   <Sparkles className="w-5 h-5 text-primary" />
+                 </div>
+                 <div>
+                   <h3 className="text-lg font-semibold text-foreground">AI Insights</h3>
+                   <p className="text-sm text-muted-foreground">Patterns and learnings from your pivot journey</p>
                  </div>
                </div>
+               <Button 
+                 onClick={generateAIInsights}
+                 disabled={isAnalyzing}
+                 size="sm"
+                 className="gap-2"
+               >
+                 {isAnalyzing ? (
+                   <>
+                     <Loader2 className="w-4 h-4 animate-spin" />
+                     Analyzing...
+                   </>
+                 ) : (
+                   <>
+                     <Sparkles className="w-4 h-4" />
+                     Generate Insights
+                   </>
+                 )}
+               </Button>
              </div>
-           ) : (
-             <div className="text-center py-8 text-muted-foreground">
-               <p>Click "Generate Insights" to get AI-powered analysis of your pivots</p>
+
+             {aiInsights ? (
+               <div className="space-y-4 mt-4">
+                 <div className="prose prose-sm max-w-none">
+                   <div className="bg-background/50 rounded-lg p-4 whitespace-pre-wrap text-foreground">
+                     {aiInsights}
+                   </div>
+                 </div>
+               </div>
+             ) : (
+               <div className="text-center py-8 text-muted-foreground">
+                 <p>Click "Generate Insights" to get AI-powered analysis of your pivots</p>
+               </div>
+             )}
+           </Card>
+
+           {/* Investor Report Card */}
+           <Card className="p-6 bg-gradient-hero/5 border-accent/20">
+             <div className="flex items-start justify-between mb-4">
+               <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                   <FileText className="w-5 h-5 text-accent" />
+                 </div>
+                 <div>
+                   <h3 className="text-lg font-semibold text-foreground">Investor Presentation</h3>
+                   <p className="text-sm text-muted-foreground">Generate a compelling report for investors</p>
+                 </div>
+               </div>
+               <div className="flex gap-2">
+                 <Button 
+                   onClick={generateInvestorReport}
+                   disabled={generatingReport}
+                   size="sm"
+                   className="gap-2"
+                 >
+                   {generatingReport ? (
+                     <>
+                       <Loader2 className="w-4 h-4 animate-spin" />
+                       Generating...
+                     </>
+                   ) : (
+                     <>
+                       <FileText className="w-4 h-4" />
+                       Generate Report
+                     </>
+                   )}
+                 </Button>
+                 {investorReport && (
+                   <Button 
+                     onClick={downloadReport}
+                     size="sm"
+                     variant="outline"
+                     className="gap-2"
+                   >
+                     <Download className="w-4 h-4" />
+                     Download
+                   </Button>
+                 )}
+               </div>
              </div>
-           )}
-         </Card>
+
+             {showInvestorReport && investorReport ? (
+               <div className="space-y-4 mt-4">
+                 <div className="prose prose-sm max-w-none dark:prose-invert">
+                   <div className="bg-background/50 rounded-lg p-6 border border-border">
+                     <div className="whitespace-pre-wrap text-foreground">
+                       {investorReport.split('\n').map((line, idx) => {
+                         // Render markdown-style headers
+                         if (line.startsWith('# ')) {
+                           return <h1 key={idx} className="text-2xl font-bold mt-6 mb-3">{line.slice(2)}</h1>;
+                         } else if (line.startsWith('## ')) {
+                           return <h2 key={idx} className="text-xl font-bold mt-5 mb-2">{line.slice(3)}</h2>;
+                         } else if (line.startsWith('### ')) {
+                           return <h3 key={idx} className="text-lg font-semibold mt-4 mb-2">{line.slice(4)}</h3>;
+                         } else if (line.startsWith('**') && line.endsWith('**')) {
+                           return <p key={idx} className="font-bold my-2">{line.slice(2, -2)}</p>;
+                         } else if (line.trim() === '') {
+                           return <br key={idx} />;
+                         } else {
+                           return <p key={idx} className="my-2">{line}</p>;
+                         }
+                       })}
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             ) : (
+               <div className="text-center py-8 text-muted-foreground">
+                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                 <p className="mb-2">Generate a professional investor presentation</p>
+                 <p className="text-xs">Showcases your journey, resilience, and strategic thinking</p>
+               </div>
+             )}
+           </Card>
+         </div>
        )}
         </TabsContent>
       </Tabs>
