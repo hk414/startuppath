@@ -35,6 +35,12 @@ const Header = () => {
             >
               Guidebook
             </button>
+            <button 
+              onClick={() => window.location.href = '/challenges'}
+              className="text-sm font-medium text-secondary hover:text-secondary/80 transition-colors cursor-pointer"
+            >
+              🎮 Challenges
+            </button>
           </div>
 
           {/* CTA Buttons */}
